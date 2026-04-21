@@ -78,7 +78,7 @@
           <label>Von (Datum)</label>
           <input type="date" id="abs-start">
         </div>
-        <div class="form-group)
+        <div class="form-group">
           <label>Bis (Datum)</label>
           <input type="date" id="abs-end">
         </div>
@@ -135,38 +135,7 @@
           <label>Mindestbesetzung Spätschicht</label>
           <input type="number" id="set-min-spaet" value="2">
         </div>
-      </div>
-
-      <div class="card">
-        <h3>Stundenberechnung (Soll / Ist)</h3>
-        <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Werte in Stunden (z.B. 8 oder 7.5)</p>
-        
-        <div class="form-group">
-            <label>Mo-Fr anwesend</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-on-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-on-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-            <label>Mo-Fr abwesend (Urlaub/Krank)</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-off-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-off-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-            <label>Samstag anwesend</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-on-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-on-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-            <label>Samstag frei</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-off-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-off-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-            <label>Sondertage (24./31.12) anwesend</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sonder-on-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sonder-on-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-            <label>Sondertage (24./31.12) abwesend</label>
-            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sonder-off-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sonder-off-ist" placeholder="Ist"></div>
-        </div>
-
-        <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Alles speichern</button>
+        <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Einstellungen speichern</button>
       </div>
     </section>
 
@@ -183,7 +152,6 @@
   </nav>
 
   <script>
-    // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
@@ -196,24 +164,14 @@
       });
     });
 
-    // --- DATEN & VARIABLEN ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
     let editIndex = -1;
     
     let settings = JSON.parse(localStorage.getItem('app_settings')) || {
-        state: 'NW', fruehStart: '06:00', fruehEnd: '14:00', spaetStart: '14:00', spaetEnd: '22:00', saStart: '06:00', saEnd: '14:00', minSpaet: 2,
-        h: {
-            mofr_on_soll: 8, mofr_on_ist: 8,
-            mofr_off_soll: 8, mofr_off_ist: 0,
-            sa_on_soll: 0, sa_on_ist: 8,
-            sa_off_soll: 0, sa_off_ist: 8,
-            sonder_on_soll: 0, sonder_on_ist: 4,
-            sonder_off_soll: 0, sonder_off_ist: 0
-        }
+        state: 'NW', fruehStart: '06:00', fruehEnd: '14:00', spaetStart: '14:00', spaetEnd: '22:00', saStart: '06:00', saEnd: '14:00', minSpaet: 2
     };
 
-    // --- EINSTELLUNGEN LOGIK ---
     function loadSettingsToForm() {
         document.getElementById('set-state').value = settings.state;
         document.getElementById('set-frueh-start').value = settings.fruehStart;
@@ -223,20 +181,6 @@
         document.getElementById('set-sa-start').value = settings.saStart;
         document.getElementById('set-sa-end').value = settings.saEnd;
         document.getElementById('set-min-spaet').value = settings.minSpaet;
-
-        // Stunden
-        document.getElementById('h-mofr-on-soll').value = settings.h.mofr_on_soll;
-        document.getElementById('h-mofr-on-ist').value = settings.h.mofr_on_ist;
-        document.getElementById('h-mofr-off-soll').value = settings.h.mofr_off_soll;
-        document.getElementById('h-mofr-off-ist').value = settings.h.mofr_off_ist;
-        document.getElementById('h-sa-on-soll').value = settings.h.sa_on_soll;
-        document.getElementById('h-sa-on-ist').value = settings.h.sa_on_ist;
-        document.getElementById('h-sa-off-soll').value = settings.h.sa_off_soll;
-        document.getElementById('h-sa-off-ist').value = settings.h.sa_off_ist;
-        document.getElementById('h-sonder-on-soll').value = settings.h.sonder_on_soll;
-        document.getElementById('h-sonder-on-ist').value = settings.h.sonder_on_ist;
-        document.getElementById('h-sonder-off-soll').value = settings.h.sonder_off_soll;
-        document.getElementById('h-sonder-off-ist').value = settings.h.sonder_off_ist;
     }
 
     function saveSettings() {
@@ -248,21 +192,7 @@
             spaetEnd: document.getElementById('set-spaet-end').value,
             saStart: document.getElementById('set-sa-start').value,
             saEnd: document.getElementById('set-sa-end').value,
-            minSpaet: parseInt(document.getElementById('set-min-spaet').value) || 2,
-            h: {
-                mofr_on_soll: parseFloat(document.getElementById('h-mofr-on-soll').value) || 0,
-                mofr_on_ist: parseFloat(document.getElementById('h-mofr-on-ist').value) || 0,
-                mofr_off_soll: parseFloat(document.getElementById('h-mofr-off-soll').value) || 0,
-                mofr_off_ist: parseFloat(document.getElementById('h-mofr-off-ist').value) || 0,
-                sa_on_soll: parseFloat(document.getElementById('h-sa-on-soll').value) || 0,
-                sa_on_ist: parseFloat(document.getElementById('h-sa-on-ist').value) || 0,
-                sa_off_soll: parseFloat(document.getElementById('h-sa-off-soll').value) || 0,
-                sa_off_ist: parseFloat(document.getElementById('h-sa-off-ist').value) || 0,
-                sonder_on_soll: parseFloat(document.getElementById('h-sonder-on-soll').value) || 0,
-                sonder_on_ist: parseFloat(document.getElementById('h-sonder-on-ist').value) || 0,
-                sonder_off_soll: parseFloat(document.getElementById('h-sonder-off-soll').value) || 0,
-                sonder_off_ist: parseFloat(document.getElementById('h-sonder-off-ist').value) || 0
-            }
+            minSpaet: parseInt(document.getElementById('set-min-spaet').value) || 2
         };
         localStorage.setItem('app_settings', JSON.stringify(settings));
         alert("Einstellungen erfolgreich gespeichert!");
