@@ -3,6 +3,7 @@
   --bg-light: #f4f7f6;
   --text-dark: #333;
   --nav-bg: #ffffff;
+  --danger: #dc3545;
 }
 
 * {
@@ -15,7 +16,7 @@
 body {
   background-color: var(--bg-light);
   color: var(--text-dark);
-  padding-bottom: 70px; /* Platz für die Bottom-Nav */
+  padding-bottom: 80px;
 }
 
 header {
@@ -26,7 +27,6 @@ header {
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .tab-content {
@@ -38,53 +38,104 @@ header {
   display: block;
 }
 
-/* Bottom Navigation */
-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: var(--nav-bg);
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid #ccc;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-  z-index: 100;
-}
-
-.nav-btn {
-  background: none;
-  border: none;
-  padding: 1rem 0.5rem;
-  flex: 1;
-  text-align: center;
-  font-size: 0.8rem;
-  color: #666;
-  cursor: pointer;
-}
-
-.nav-btn.active {
-  color: var(--primary);
-  font-weight: bold;
-  border-top: 3px solid var(--primary);
+.card {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 1rem;
 }
 
 /* Form Styles */
-.card {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.form-group {
   margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  font-weight: bold;
+}
+
+input[type="text"], input[type="color"], select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.5rem;
 }
 
 button.primary-btn {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 0.8rem 1rem;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 8px;
   width: 100%;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 10px;
+}
+
+/* Mitarbeiter Liste */
+.employee-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Bottom Nav */
+nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: var(--nav-bg);
+  display: flex;
+  border-top: 1px solid #eee;
+  z-index: 100;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  flex: 1;
+  padding: 1rem 0;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.nav-btn.active {
+  color: var(--primary);
+  border-top: 3px solid var(--primary);
 }
