@@ -6,98 +6,130 @@
   <title>Dienstplan Generator</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
-  <meta name="theme-color" content="#007bff">
 </head>
 <body>
 
-  <header>
-    <h1 id="app-title">Team</h1>
-  </header>
+  <header><h1 id="app-title">Team</h1></header>
 
   <main>
     <section id="team" class="tab-content active">
       <div class="card">
-        <h3>Neuer Mitarbeiter</h3>
-        <p>Hier kommt das Formular für Name, Farbe, Festtage etc. hin.</p>
-        <button class="primary-btn" onclick="alert('Mitarbeiter-Logik folgt!')">+ Mitarbeiter anlegen</button>
+        <h3>Mitarbeiter hinzufügen</h3>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="emp-name" placeholder="z.B. Max Mustermann">
+        </div>
+        <div class="form-group">
+          <label>Anzeige-Farbe</label>
+          <input type="color" id="emp-color" value="#007bff">
+        </div>
+        <div class="form-group">
+          <label>Fester freier Tag</label>
+          <select id="emp-freeday">
+            <option value="none">Keiner</option>
+            <option value="1">Montag</option>
+            <option value="2">Dienstag</option>
+            <option value="3">Mittwoch</option>
+            <option value="4">Donnerstag</option>
+            <option value="5">Freitag</option>
+          </select>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="emp-sat-rule">
+          <label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label>
+        </div>
+        <button class="primary-btn" onclick="addEmployee()" style="margin-top:1rem">Speichern</button>
       </div>
-      <div id="employee-list"></div>
+
+      <div class="card">
+        <h3>Team Liste</h3>
+        <div id="employee-list">
+          </div>
+      </div>
     </section>
 
-    <section id="urlaub" class="tab-content">
-      <div class="card">
-        <h3>Abwesenheit eintragen</h3>
-        <p>Kalender-Auswahl für Urlaub, Krank oder Wunschfrei.</p>
-      </div>
-    </section>
-
-    <section id="generieren" class="tab-content">
-      <div class="card">
-        <h3>Dienstplan erstellen</h3>
-        <p>Prüft Konflikte und wendet die Schichtwechsel-Logik an.</p>
-        <button class="primary-btn">Plan generieren</button>
-      </div>
-    </section>
-
-    <section id="plaene" class="tab-content">
-      <div class="card">
-        <h3>Gespeicherte Pläne</h3>
-        <p>Hier werden die PDFs und CSVs zum Download angeboten.</p>
-      </div>
-    </section>
-
-    <section id="einstellungen" class="tab-content">
-      <div class="card">
-        <h3>Schichtzeiten & Stunden</h3>
-        <p>Konfiguration der Mindestbesetzung, Stunden-Logik und Bundesland.</p>
-      </div>
-    </section>
+    <section id="urlaub" class="tab-content"><div class="card">Urlaubs-Funktion folgt...</div></section>
+    <section id="generieren" class="tab-content"><div class="card">Planungs-Logik folgt...</div></section>
+    <section id="plaene" class="tab-content"><div class="card">Archiv folgt...</div></section>
+    <section id="einstellungen" class="tab-content"><div class="card">Optionen folgen...</div></section>
   </main>
 
   <nav>
     <button class="nav-btn active" data-target="team">Team</button>
     <button class="nav-btn" data-target="urlaub">Urlaub</button>
-    <button class="nav-btn" data-target="generieren">Generieren</button>
+    <button class="nav-btn" data-target="generieren">Planen</button>
     <button class="nav-btn" data-target="plaene">Pläne</button>
     <button class="nav-btn" data-target="einstellungen">Setup</button>
   </nav>
 
   <script>
-    // 1. Service Worker Registrierung (PWA)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker registriert', reg))
-          .catch(err => console.error('SW Error', err));
-      });
-    }
-
-    // 2. Tab Navigation Logik
+    // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    const appTitle = document.getElementById('app-title');
-
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        // Active states entfernen
         navButtons.forEach(b => b.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
-
-        // Neuen Tab aktivieren
         btn.classList.add('active');
-        const targetId = btn.getAttribute('data-target');
-        document.getElementById(targetId).classList.add('active');
-        
-        // Titel im Header anpassen
-        appTitle.innerText = btn.innerText;
+        document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+        document.getElementById('app-title').innerText = btn.innerText;
       });
     });
 
-    // Hier wird später der komplexe Algorithmus und die IndexedDB (Datenbank) eingebaut.
-    // Datenstruktur für die Zukunft:
-    let employees = []; // Speichert Objekte {id, name, color, fixedDayOff, participatesInSatRule...}
-    let absences = []; // Speichert Objekte {empId, type, startDate, endDate}
-    let settings = { state: 'BE', earlyStart: '06:00', lateStart: '14:00' };
+    // --- MITARBEITER LOGIK ---
+    let employees = JSON.parse(localStorage.getItem('team_data')) || [];
+
+    function renderEmployees() {
+      const list = document.getElementById('employee-list');
+      list.innerHTML = '';
+      employees.forEach((emp, index) => {
+        const div = document.createElement('div');
+        div.className = 'employee-item';
+        div.innerHTML = `
+          <div class="employee-info">
+            <div class="color-dot" style="background:${emp.color}"></div>
+            <span>${emp.name}</span>
+          </div>
+          <button class="delete-btn" onclick="deleteEmployee(${index})">Löschen</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addEmployee() {
+      const name = document.getElementById('emp-name').value;
+      const color = document.getElementById('emp-color').value;
+      const freeday = document.getElementById('emp-freeday').value;
+      const satRule = document.getElementById('emp-sat-rule').checked;
+
+      if(!name) return alert("Bitte Namen eingeben");
+
+      employees.push({ name, color, freeday, satRule });
+      saveAndRender();
+      
+      // Formular leeren
+      document.getElementById('emp-name').value = '';
+    }
+
+    function deleteEmployee(index) {
+      if(confirm("Mitarbeiter wirklich löschen?")) {
+        employees.splice(index, 1);
+        saveAndRender();
+      }
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('team_data', JSON.stringify(employees));
+      renderEmployees();
+    }
+
+    // Initial beim Start laden
+    renderEmployees();
+
+    // Service Worker Register
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
   </script>
 </body>
 </html>
