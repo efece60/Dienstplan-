@@ -34,6 +34,14 @@
             <option value="5">Freitag</option>
           </select>
         </div>
+        
+        <div class="form-group">
+          <label>Schicht-Pairing (Immer gleiche Schicht mit...)</label>
+          <select id="emp-pairing">
+            <option value="none">Niemandem (Standard)</option>
+            </select>
+        </div>
+
         <div class="checkbox-group">
           <input type="checkbox" id="emp-sat-rule">
           <label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label>
@@ -52,8 +60,7 @@
         <h3>Abwesenheit eintragen</h3>
         <div class="form-group">
           <label>Mitarbeiter</label>
-          <select id="abs-employee">
-            </select>
+          <select id="abs-employee"></select>
         </div>
         <div class="form-group">
           <label>Art der Abwesenheit</label>
@@ -94,7 +101,6 @@
   </nav>
 
   <script>
-    // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
@@ -107,75 +113,100 @@
       });
     });
 
-    // --- DATEN LADEN ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
 
-    // --- TEAM LOGIK ---
     function renderEmployees() {
       const list = document.getElementById('employee-list');
       list.innerHTML = '';
       employees.forEach((emp, index) => {
         const div = document.createElement('div');
         div.className = 'employee-item';
+        
+        // Zeige das Pairing in der Liste an, wenn es existiert
+        let pairingText = emp.pairedWith && emp.pairedWith !== 'none' 
+          ? `<br><span style="font-size: 0.8rem; color: #666;">🔗 Gekoppelt mit: ${emp.pairedWith}</span>` 
+          : '';
+
         div.innerHTML = `
           <div class="employee-info">
-            <div class="color-dot" style="background:${emp.color}"></div>
-            <span>${emp.name}</span>
+            <div class="color-dot" style="background:${emp.color}; min-width: 20px;"></div>
+            <div>
+                <span><strong>${emp.name}</strong></span>
+                ${pairingText}
+            </div>
           </div>
           <button class="delete-btn" onclick="deleteEmployee(${index})">Löschen</button>
         `;
         list.appendChild(div);
       });
-      updateEmployeeDropdown(); // Dropdown im Urlaubs-Tab aktualisieren
+      
+      updateDropdowns(); 
+    }
+
+    // Aktualisiert die Dropdowns für Urlaub UND Pairing
+    function updateDropdowns() {
+      const absSelect = document.getElementById('abs-employee');
+      const pairSelect = document.getElementById('emp-pairing');
+      
+      absSelect.innerHTML = '';
+      pairSelect.innerHTML = '<option value="none">Niemandem (Standard)</option>';
+
+      employees.forEach((emp) => {
+        // Für den Urlaub
+        const absOption = document.createElement('option');
+        absOption.value = emp.name;
+        absOption.text = emp.name;
+        absSelect.appendChild(absOption);
+
+        // Für das Pairing
+        const pairOption = document.createElement('option');
+        pairOption.value = emp.name;
+        pairOption.text = emp.name;
+        pairSelect.appendChild(pairOption);
+      });
     }
 
     function addEmployee() {
       const name = document.getElementById('emp-name').value;
       const color = document.getElementById('emp-color').value;
       const freeday = document.getElementById('emp-freeday').value;
+      const pairedWith = document.getElementById('emp-pairing').value;
       const satRule = document.getElementById('emp-sat-rule').checked;
 
       if(!name) return alert("Bitte Namen eingeben");
 
-      employees.push({ name, color, freeday, satRule });
+      employees.push({ name, color, freeday, pairedWith, satRule });
       localStorage.setItem('team_data', JSON.stringify(employees));
       renderEmployees();
       document.getElementById('emp-name').value = '';
+      document.getElementById('emp-pairing').value = 'none'; // Zurücksetzen
     }
 
     function deleteEmployee(index) {
       if(confirm("Mitarbeiter wirklich löschen?")) {
+        // Falls jemand mit diesem Mitarbeiter gekoppelt war, die Kopplung entfernen
+        const deletedName = employees[index].name;
         employees.splice(index, 1);
+        
+        employees.forEach(emp => {
+            if(emp.pairedWith === deletedName) emp.pairedWith = 'none';
+        });
+
         localStorage.setItem('team_data', JSON.stringify(employees));
         renderEmployees();
       }
     }
 
-    // --- URLAUB LOGIK ---
-    function updateEmployeeDropdown() {
-      const select = document.getElementById('abs-employee');
-      select.innerHTML = '';
-      employees.forEach((emp, index) => {
-        const option = document.createElement('option');
-        option.value = emp.name;
-        option.text = emp.name;
-        select.appendChild(option);
-      });
-    }
-
     function renderAbsences() {
       const list = document.getElementById('absence-list');
       list.innerHTML = '';
-      
-      // Sortieren nach Startdatum
       absences.sort((a, b) => new Date(a.start) - new Date(b.start));
 
       absences.forEach((abs, index) => {
         const div = document.createElement('div');
-        div.className = 'employee-item'; // Nutze den gleichen Style wie beim Team
+        div.className = 'employee-item'; 
         
-        // Datum schön formatieren
         const startDate = new Date(abs.start).toLocaleDateString('de-DE');
         const endDate = new Date(abs.end).toLocaleDateString('de-DE');
         const dateString = abs.start === abs.end ? startDate : `${startDate} - ${endDate}`;
@@ -195,9 +226,9 @@
       const employeeName = document.getElementById('abs-employee').value;
       const type = document.getElementById('abs-type').value;
       const start = document.getElementById('abs-start').value;
-      const end = document.getElementById('abs-end').value || start; // Wenn kein Ende, dann ist es nur 1 Tag
+      const end = document.getElementById('abs-end').value || start; 
 
-      if(!employeeName) return alert("Bitte erst Mitarbeiter im Team-Tab anlegen!");
+      if(!employeeName) return alert("Bitte erst Mitarbeiter anlegen!");
       if(!start) return alert("Bitte Startdatum auswählen!");
       if(new Date(end) < new Date(start)) return alert("Das Enddatum darf nicht vor dem Startdatum liegen!");
 
@@ -205,7 +236,6 @@
       localStorage.setItem('absence_data', JSON.stringify(absences));
       renderAbsences();
       
-      // Felder leeren
       document.getElementById('abs-start').value = '';
       document.getElementById('abs-end').value = '';
       alert('Erfolgreich eingetragen!');
@@ -219,11 +249,9 @@
       }
     }
 
-    // Initial beim Start laden
     renderEmployees();
     renderAbsences();
 
-    // Service Worker Register
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js');
     }
