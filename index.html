@@ -7,7 +7,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Styling für den Plan */
     .plan-table { border-collapse: collapse; width: 100%; min-width: 700px; font-size: 0.85rem; margin-top: 10px; }
     .plan-table th, .plan-table td { border: 1px solid #ccc; padding: 6px; text-align: center; }
     .plan-table th { background: #eee; position: sticky; top: 0; }
@@ -34,9 +33,8 @@
         <div class="form-group">
           <label>Fester freier Tag</label>
           <select id="emp-freeday">
-            <option value="none">Keiner</option>
-            <option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option>
-            <option value="4">Donnerstag</option><option value="5">Freitag</option>
+            <option value="none">Keiner</option><option value="1">Montag</option><option value="2">Dienstag</option>
+            <option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option>
           </select>
         </div>
         <div class="form-group">
@@ -44,17 +42,14 @@
           <select id="emp-pairing"><option value="none">Niemandem (Standard)</option></select>
         </div>
         <div class="checkbox-group">
-          <input type="checkbox" id="emp-sat-rule"><label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label>
+          <input type="checkbox" id="emp-sat-rule" checked><label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label>
         </div>
         <div id="form-buttons" style="margin-top: 1rem; display: flex; gap: 10px;">
             <button class="primary-btn" id="btn-save" onclick="handleEmployeeSave()">Speichern</button>
             <button class="primary-btn" id="btn-cancel" onclick="cancelEdit()" style="display:none; background: #666;">Abbrechen</button>
         </div>
       </div>
-      <div class="card">
-        <h3>Team Liste</h3>
-        <div id="employee-list"></div>
-      </div>
+      <div class="card"><h3>Team Liste</h3><div id="employee-list"></div></div>
     </section>
 
     <section id="urlaub" class="tab-content">
@@ -62,25 +57,19 @@
         <h3>Abwesenheit eintragen</h3>
         <div class="form-group"><label>Mitarbeiter</label><select id="abs-employee"></select></div>
         <div class="form-group"><label>Art der Abwesenheit</label><select id="abs-type"><option value="Urlaub">Urlaub</option><option value="Wunschfrei">Wunschfrei</option><option value="Krank">Krankmeldung</option></select></div>
-        <div class="form-group"><label>Von (Datum)</label><input type="date" id="abs-start"></div>
-        <div class="form-group"><label>Bis (Datum)</label><input type="date" id="abs-end"></div>
+        <div class="form-group"><label>Von</label><input type="date" id="abs-start"></div>
+        <div class="form-group"><label>Bis</label><input type="date" id="abs-end"></div>
         <button class="primary-btn" onclick="addAbsence()" style="margin-top:1rem">Eintragen</button>
       </div>
-      <div class="card">
-        <h3>Geplante Abwesenheiten</h3>
-        <div id="absence-list"></div>
-      </div>
+      <div class="card"><h3>Geplante Abwesenheiten</h3><div id="absence-list"></div></div>
     </section>
 
     <section id="generieren" class="tab-content">
       <div class="card">
         <h3>Dienstplan erstellen</h3>
-        <div class="form-group">
-          <label>Monat auswählen</label>
-          <input type="month" id="plan-month">
-        </div>
+        <div class="form-group"><label>Monat auswählen</label><input type="month" id="plan-month"></div>
         <button class="primary-btn" onclick="startGeneration()">Plan berechnen</button>
-        <div id="plan-error" style="color: var(--danger); margin-top: 10px; font-weight: bold; display:none;"></div>
+        <div id="plan-error" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-top: 10px; font-weight: bold; display:none;"></div>
       </div>
 
       <div id="plan-result-container" style="display:none;">
@@ -99,7 +88,7 @@
       <div class="card">
         <h3>Allgemein</h3>
         <div class="form-group">
-          <label>Bundesland (für Feiertage)</label>
+          <label>Bundesland</label>
           <select id="set-state">
             <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option><option value="BE">Berlin</option>
             <option value="BB">Brandenburg</option><option value="HB">Bremen</option><option value="HH">Hamburg</option>
@@ -113,40 +102,34 @@
 
       <div class="card">
         <h3>Schichtzeiten & Besetzung</h3>
-        <div class="form-group"><label>Frühschicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div></div>
-        <div class="form-group"><label>Spätschicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div></div>
-        <div class="form-group"><label>Samstags-Schicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div></div>
+        <div class="form-group"><label>Frühschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div></div>
+        <div class="form-group"><label>Spätschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div></div>
+        <div class="form-group"><label>Samstags-Schicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div></div>
         <div class="form-group"><label>Mindestbesetzung Spätschicht</label><input type="number" id="set-min-spaet" value="2"></div>
       </div>
 
       <div class="card">
         <h3>Stundenberechnung (Soll / Ist)</h3>
-        <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Urlaub und Krankheit (Mo-Fr: 8h, Sa/Feiertag: 0h) sind fest im Code hinterlegt.</p>
-
-        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Reguläre Tage (Mo-Fr)</h4>
+        <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Urlaub und Krankheit (Mo-Fr: 8h, Sa: 0h) sind fest im Code hinterlegt.</p>
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd;">Reguläre Tage (Mo-Fr)</h4>
         <div class="form-group"><label>Mo-Fr anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-work-soll"><input type="number" step="0.1" id="h-mofr-work-ist"></div></div>
         <div class="form-group"><label>Mo-Fr abwesend (Wunschfrei)</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-frei-soll"><input type="number" step="0.1" id="h-mofr-frei-ist"></div></div>
-
-        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Samstage</h4>
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd;">Samstage</h4>
         <div class="form-group"><label>Samstag anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-work-soll"><input type="number" step="0.1" id="h-sa-work-ist"></div></div>
         <div class="form-group"><label>Samstag abwesend (Wunschfrei)</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-frei-soll"><input type="number" step="0.1" id="h-sa-frei-ist"></div></div>
-
-        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Feiertage & Sondertage</h4>
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd;">Feiertage & Sondertage</h4>
         <div class="form-group"><label>Feiertage anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-work-soll"><input type="number" step="0.1" id="h-feiertag-work-ist"></div></div>
         <div class="form-group"><label>Feiertage abwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-frei-soll"><input type="number" step="0.1" id="h-feiertag-frei-ist"></div></div>
-
         <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Einstellungen speichern</button>
       </div>
     </section>
     
-    <section id="plaene" class="tab-content"><div class="card">Speicher- und PDF-Funktion folgt im nächsten Schritt!</div></section>
+    <section id="plaene" class="tab-content"><div class="card">Export kommt als nächstes!</div></section>
   </main>
 
   <nav>
-    <button class="nav-btn active" data-target="team">Team</button>
-    <button class="nav-btn" data-target="urlaub">Urlaub</button>
-    <button class="nav-btn" data-target="generieren">Planen</button>
-    <button class="nav-btn" data-target="plaene">Pläne</button>
+    <button class="nav-btn active" data-target="team">Team</button><button class="nav-btn" data-target="urlaub">Urlaub</button>
+    <button class="nav-btn" data-target="generieren">Planen</button><button class="nav-btn" data-target="plaene">Pläne</button>
     <button class="nav-btn" data-target="einstellungen">Setup</button>
   </nav>
 
@@ -156,208 +139,76 @@
     const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        navButtons.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+        navButtons.forEach(b => b.classList.remove('active')); tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active'); document.getElementById(btn.getAttribute('data-target')).classList.add('active');
         document.getElementById('app-title').innerText = btn.innerText;
       });
     });
 
-    // --- DATEN LADEN & INIT ---
+    // --- DATEN INIT ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
     let editIndex = -1;
     let settings = JSON.parse(localStorage.getItem('app_settings')) || {};
 
     if(!settings.state) settings.state = 'NW';
-    if(!settings.fruehStart) settings.fruehStart = '06:00';
-    if(!settings.fruehEnd) settings.fruehEnd = '14:00';
-    if(!settings.spaetStart) settings.spaetStart = '14:00';
-    if(!settings.spaetEnd) settings.spaetEnd = '22:00';
-    if(!settings.saStart) settings.saStart = '06:00';
-    if(!settings.saEnd) settings.saEnd = '14:00';
+    if(!settings.fruehStart) settings.fruehStart = '06:00'; if(!settings.fruehEnd) settings.fruehEnd = '14:00';
+    if(!settings.spaetStart) settings.spaetStart = '14:00'; if(!settings.spaetEnd) settings.spaetEnd = '22:00';
+    if(!settings.saStart) settings.saStart = '06:00'; if(!settings.saEnd) settings.saEnd = '14:00';
     if(!settings.minSpaet) settings.minSpaet = 2;
     
     if(!settings.h) settings.h = {};
-    const defaultHours = {
-        mofr_work_soll: 8, mofr_work_ist: 8, mofr_frei_soll: 8, mofr_frei_ist: 0,
-        sa_work_soll: 0, sa_work_ist: 8, sa_frei_soll: 0, sa_frei_ist: 0,
-        feiertag_work_soll: 0, feiertag_work_ist: 8, feiertag_frei_soll: 0, feiertag_frei_ist: 0
-    };
-    for(let key in defaultHours) {
-        if(settings.h[key] === undefined) settings.h[key] = defaultHours[key];
-    }
+    const defaultHours = { mofr_work_soll: 8, mofr_work_ist: 8, mofr_frei_soll: 8, mofr_frei_ist: 0, sa_work_soll: 0, sa_work_ist: 8, sa_frei_soll: 0, sa_frei_ist: 8, feiertag_work_soll: 0, feiertag_work_ist: 8, feiertag_frei_soll: 0, feiertag_frei_ist: 0 };
+    for(let key in defaultHours) { if(settings.h[key] === undefined) settings.h[key] = defaultHours[key]; }
 
-    // --- SETUP LOGIK ---
+    // --- LOGIK: TEAM, URLAUB, SETUP (Gekürzt für Übersichtlichkeit, aber voll funktionsfähig) ---
     function loadSettingsToForm() {
-        document.getElementById('set-state').value = settings.state;
-        document.getElementById('set-frueh-start').value = settings.fruehStart; document.getElementById('set-frueh-end').value = settings.fruehEnd;
-        document.getElementById('set-spaet-start').value = settings.spaetStart; document.getElementById('set-spaet-end').value = settings.spaetEnd;
-        document.getElementById('set-sa-start').value = settings.saStart; document.getElementById('set-sa-end').value = settings.saEnd;
-        document.getElementById('set-min-spaet').value = settings.minSpaet;
-
-        document.getElementById('h-mofr-work-soll').value = settings.h.mofr_work_soll; document.getElementById('h-mofr-work-ist').value = settings.h.mofr_work_ist;
-        document.getElementById('h-mofr-frei-soll').value = settings.h.mofr_frei_soll; document.getElementById('h-mofr-frei-ist').value = settings.h.mofr_frei_ist;
-        document.getElementById('h-sa-work-soll').value = settings.h.sa_work_soll; document.getElementById('h-sa-work-ist').value = settings.h.sa_work_ist;
-        document.getElementById('h-sa-frei-soll').value = settings.h.sa_frei_soll; document.getElementById('h-sa-frei-ist').value = settings.h.sa_frei_ist;
-        document.getElementById('h-feiertag-work-soll').value = settings.h.feiertag_work_soll; document.getElementById('h-feiertag-work-ist').value = settings.h.feiertag_work_ist;
-        document.getElementById('h-feiertag-frei-soll').value = settings.h.feiertag_frei_soll; document.getElementById('h-feiertag-frei-ist').value = settings.h.feiertag_frei_ist;
+        document.getElementById('set-state').value = settings.state; document.getElementById('set-frueh-start').value = settings.fruehStart; document.getElementById('set-frueh-end').value = settings.fruehEnd; document.getElementById('set-spaet-start').value = settings.spaetStart; document.getElementById('set-spaet-end').value = settings.spaetEnd; document.getElementById('set-sa-start').value = settings.saStart; document.getElementById('set-sa-end').value = settings.saEnd; document.getElementById('set-min-spaet').value = settings.minSpaet;
+        document.getElementById('h-mofr-work-soll').value = settings.h.mofr_work_soll; document.getElementById('h-mofr-work-ist').value = settings.h.mofr_work_ist; document.getElementById('h-mofr-frei-soll').value = settings.h.mofr_frei_soll; document.getElementById('h-mofr-frei-ist').value = settings.h.mofr_frei_ist; document.getElementById('h-sa-work-soll').value = settings.h.sa_work_soll; document.getElementById('h-sa-work-ist').value = settings.h.sa_work_ist; document.getElementById('h-sa-frei-soll').value = settings.h.sa_frei_soll; document.getElementById('h-sa-frei-ist').value = settings.h.sa_frei_ist; document.getElementById('h-feiertag-work-soll').value = settings.h.feiertag_work_soll; document.getElementById('h-feiertag-work-ist').value = settings.h.feiertag_work_ist; document.getElementById('h-feiertag-frei-soll').value = settings.h.feiertag_frei_soll; document.getElementById('h-feiertag-frei-ist').value = settings.h.feiertag_frei_ist;
     }
-
     function saveSettings() {
-        settings.state = document.getElementById('set-state').value;
-        settings.fruehStart = document.getElementById('set-frueh-start').value; settings.fruehEnd = document.getElementById('set-frueh-end').value;
-        settings.spaetStart = document.getElementById('set-spaet-start').value; settings.spaetEnd = document.getElementById('set-spaet-end').value;
-        settings.saStart = document.getElementById('set-sa-start').value; settings.saEnd = document.getElementById('set-sa-end').value;
-        settings.minSpaet = parseInt(document.getElementById('set-min-spaet').value) || 2;
-        
-        settings.h.mofr_work_soll = parseFloat(document.getElementById('h-mofr-work-soll').value) || 0; settings.h.mofr_work_ist = parseFloat(document.getElementById('h-mofr-work-ist').value) || 0;
-        settings.h.mofr_frei_soll = parseFloat(document.getElementById('h-mofr-frei-soll').value) || 0; settings.h.mofr_frei_ist = parseFloat(document.getElementById('h-mofr-frei-ist').value) || 0;
-        settings.h.sa_work_soll = parseFloat(document.getElementById('h-sa-work-soll').value) || 0; settings.h.sa_work_ist = parseFloat(document.getElementById('h-sa-work-ist').value) || 0;
-        settings.h.sa_frei_soll = parseFloat(document.getElementById('h-sa-frei-soll').value) || 0; settings.h.sa_frei_ist = parseFloat(document.getElementById('h-sa-frei-ist').value) || 0;
-        settings.h.feiertag_work_soll = parseFloat(document.getElementById('h-feiertag-work-soll').value) || 0; settings.h.feiertag_work_ist = parseFloat(document.getElementById('h-feiertag-work-ist').value) || 0;
-        settings.h.feiertag_frei_soll = parseFloat(document.getElementById('h-feiertag-frei-soll').value) || 0; settings.h.feiertag_frei_ist = parseFloat(document.getElementById('h-feiertag-frei-ist').value) || 0;
-        
-        localStorage.setItem('app_settings', JSON.stringify(settings));
-        alert("Einstellungen erfolgreich gespeichert!");
+        settings.state = document.getElementById('set-state').value; settings.fruehStart = document.getElementById('set-frueh-start').value; settings.fruehEnd = document.getElementById('set-frueh-end').value; settings.spaetStart = document.getElementById('set-spaet-start').value; settings.spaetEnd = document.getElementById('set-spaet-end').value; settings.saStart = document.getElementById('set-sa-start').value; settings.saEnd = document.getElementById('set-sa-end').value; settings.minSpaet = parseInt(document.getElementById('set-min-spaet').value) || 2;
+        settings.h.mofr_work_soll = parseFloat(document.getElementById('h-mofr-work-soll').value)||0; settings.h.mofr_work_ist = parseFloat(document.getElementById('h-mofr-work-ist').value)||0; settings.h.mofr_frei_soll = parseFloat(document.getElementById('h-mofr-frei-soll').value)||0; settings.h.mofr_frei_ist = parseFloat(document.getElementById('h-mofr-frei-ist').value)||0; settings.h.sa_work_soll = parseFloat(document.getElementById('h-sa-work-soll').value)||0; settings.h.sa_work_ist = parseFloat(document.getElementById('h-sa-work-ist').value)||0; settings.h.sa_frei_soll = parseFloat(document.getElementById('h-sa-frei-soll').value)||0; settings.h.sa_frei_ist = parseFloat(document.getElementById('h-sa-frei-ist').value)||0; settings.h.feiertag_work_soll = parseFloat(document.getElementById('h-feiertag-work-soll').value)||0; settings.h.feiertag_work_ist = parseFloat(document.getElementById('h-feiertag-work-ist').value)||0; settings.h.feiertag_frei_soll = parseFloat(document.getElementById('h-feiertag-frei-soll').value)||0; settings.h.feiertag_frei_ist = parseFloat(document.getElementById('h-feiertag-frei-ist').value)||0;
+        localStorage.setItem('app_settings', JSON.stringify(settings)); alert("Gespeichert!");
     }
 
-    // --- TEAM LOGIK ---
     function renderEmployees() {
-      const list = document.getElementById('employee-list');
-      if(!list) return;
-      list.innerHTML = '';
-      employees.forEach((emp, index) => {
-        let pairingText = emp.pairedWith && emp.pairedWith !== 'none' ? `<br><span style="font-size: 0.8rem; color: #666;">🔗 Gekoppelt mit: ${emp.pairedWith}</span>` : '';
-        const div = document.createElement('div');
-        div.className = 'employee-item';
-        div.innerHTML = `
-          <div class="employee-info">
-            <div class="color-dot" style="background:${emp.color}; width:20px; height:20px; border-radius:50%; border:1px solid #ccc;"></div>
-            <div><span><strong>${emp.name}</strong></span>${pairingText}</div>
-          </div>
-          <div style="display:flex; gap:10px;">
-            <button onclick="editEmployee(${index})" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">Edit</button>
-            <button class="delete-btn" onclick="deleteEmployee(${index})" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">Löschen</button>
-          </div>
-        `;
-        list.appendChild(div);
+      const list = document.getElementById('employee-list'); if(!list) return; list.innerHTML = '';
+      employees.forEach((emp, i) => {
+        let pText = emp.pairedWith && emp.pairedWith !== 'none' ? `<br><small style="color:#666">🔗 Mit: ${emp.pairedWith}</small>` : '';
+        list.innerHTML += `<div class="employee-item"><div class="employee-info"><div class="color-dot" style="background:${emp.color}; width:15px; height:15px; border-radius:50%;"></div><div><strong>${emp.name}</strong>${pText}</div></div><div><button onclick="editEmployee(${i})" style="background:none;border:none;color:var(--primary);font-weight:bold;margin-right:10px;">Edit</button><button class="delete-btn" onclick="deleteEmployee(${i})" style="background:none;border:none;color:var(--danger);font-weight:bold;">X</button></div></div>`;
       });
       updateDropdowns(); 
     }
-
     function updateDropdowns() {
-      const absSelect = document.getElementById('abs-employee');
-      const pairSelect = document.getElementById('emp-pairing');
-      if(absSelect) absSelect.innerHTML = '';
-      if(pairSelect) {
-          pairSelect.innerHTML = '<option value="none">Niemandem (Standard)</option>';
-          employees.forEach(emp => {
-            pairSelect.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
-          });
-      }
-      if(absSelect) {
-          employees.forEach(emp => {
-            absSelect.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
-          });
-      }
-    }
-
-    function handleEmployeeSave() {
-      const name = document.getElementById('emp-name').value;
-      if(!name) return alert("Bitte Namen eingeben");
-      const data = { 
-          name, 
-          color: document.getElementById('emp-color').value, 
-          freeday: document.getElementById('emp-freeday').value, 
-          pairedWith: document.getElementById('emp-pairing').value, 
-          satRule: document.getElementById('emp-sat-rule').checked 
-      };
-      
-      if(editIndex === -1) { 
-          employees.push(data); 
-      } else { 
-          const oldName = employees[editIndex].name;
-          if(oldName !== name) { employees.forEach(e => { if(e.pairedWith === oldName) e.pairedWith = name; }); }
-          employees[editIndex] = data; 
-          cancelEdit(); 
-      }
-      localStorage.setItem('team_data', JSON.stringify(employees));
-      renderEmployees(); 
-      document.getElementById('emp-name').value = '';
-    }
-
-    function editEmployee(index) {
-        editIndex = index;
-        const emp = employees[index];
-        document.getElementById('emp-name').value = emp.name;
-        document.getElementById('emp-color').value = emp.color;
-        document.getElementById('emp-freeday').value = emp.freeday;
-        document.getElementById('emp-pairing').value = emp.pairedWith || 'none';
-        document.getElementById('emp-sat-rule').checked = emp.satRule;
-        document.getElementById('form-title').innerText = "Mitarbeiter bearbeiten";
-        document.getElementById('btn-save').innerText = "Änderung übernehmen";
-        document.getElementById('btn-cancel').style.display = "block";
-        window.scrollTo(0,0);
-    }
-
-    function cancelEdit() {
-        editIndex = -1;
-        document.getElementById('form-title').innerText = "Mitarbeiter hinzufügen";
-        document.getElementById('btn-save').innerText = "Speichern";
-        document.getElementById('btn-cancel').style.display = "none";
-        document.getElementById('emp-name').value = '';
-        document.getElementById('emp-pairing').value = 'none';
-        document.getElementById('emp-sat-rule').checked = false;
-        document.getElementById('emp-freeday').value = 'none';
-    }
-
-    function deleteEmployee(index) {
-      if(confirm("Mitarbeiter wirklich löschen?")) {
-        const deletedName = employees[index].name;
-        employees.splice(index, 1);
-        employees.forEach(emp => { if(emp.pairedWith === deletedName) emp.pairedWith = 'none'; });
-        localStorage.setItem('team_data', JSON.stringify(employees));
-        renderEmployees();
-      }
-    }
-
-    // --- URLAUB LOGIK ---
-    function renderAbsences() {
-      const list = document.getElementById('absence-list');
-      if(!list) return;
-      list.innerHTML = '';
-      absences.sort((a, b) => new Date(a.start) - new Date(b.start));
-      absences.forEach((abs, index) => {
-        const startDate = new Date(abs.start).toLocaleDateString('de-DE');
-        const endDate = new Date(abs.end).toLocaleDateString('de-DE');
-        const dateString = abs.start === abs.end ? startDate : `${startDate} - ${endDate}`;
-        list.innerHTML += `<div class="employee-item"><div class="employee-info" style="flex-direction:column; align-items:flex-start;"><strong>${abs.employeeName} (${abs.type})</strong><span style="font-size:0.85rem;color:#666;">${dateString}</span></div><button class="delete-btn" onclick="deleteAbsence(${index})" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">Löschen</button></div>`;
+      const absS = document.getElementById('abs-employee'), pairS = document.getElementById('emp-pairing');
+      if(absS) absS.innerHTML = ''; if(pairS) pairS.innerHTML = '<option value="none">Niemandem</option>';
+      employees.forEach(emp => {
+        if(pairS) pairS.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
+        if(absS) absS.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
       });
     }
+    function handleEmployeeSave() {
+      const name = document.getElementById('emp-name').value; if(!name) return alert("Name fehlt");
+      const data = { name, color: document.getElementById('emp-color').value, freeday: document.getElementById('emp-freeday').value, pairedWith: document.getElementById('emp-pairing').value, satRule: document.getElementById('emp-sat-rule').checked };
+      if(editIndex === -1) employees.push(data); else { const o = employees[editIndex].name; if(o!==name) employees.forEach(e=>{if(e.pairedWith===o)e.pairedWith=name;}); employees[editIndex] = data; cancelEdit(); }
+      localStorage.setItem('team_data', JSON.stringify(employees)); renderEmployees(); document.getElementById('emp-name').value = '';
+    }
+    function editEmployee(i) { editIndex = i; const e = employees[i]; document.getElementById('emp-name').value = e.name; document.getElementById('emp-color').value = e.color; document.getElementById('emp-freeday').value = e.freeday; document.getElementById('emp-pairing').value = e.pairedWith||'none'; document.getElementById('emp-sat-rule').checked = e.satRule; document.getElementById('form-title').innerText = "Bearbeiten"; document.getElementById('btn-save').innerText = "Update"; document.getElementById('btn-cancel').style.display="block"; window.scrollTo(0,0);}
+    function cancelEdit() { editIndex = -1; document.getElementById('form-title').innerText = "Hinzufügen"; document.getElementById('btn-save').innerText = "Speichern"; document.getElementById('btn-cancel').style.display="none"; document.getElementById('emp-name').value = ''; document.getElementById('emp-freeday').value = 'none'; document.getElementById('emp-sat-rule').checked=true; document.getElementById('emp-pairing').value='none';}
+    function deleteEmployee(i) { if(confirm("Löschen?")) { const d = employees[i].name; employees.splice(i, 1); employees.forEach(e=>{if(e.pairedWith===d)e.pairedWith='none';}); localStorage.setItem('team_data', JSON.stringify(employees)); renderEmployees(); } }
 
+    function renderAbsences() {
+      const list = document.getElementById('absence-list'); if(!list) return; list.innerHTML = ''; absences.sort((a,b)=>new Date(a.start)-new Date(b.start));
+      absences.forEach((abs, i) => { list.innerHTML += `<div class="employee-item"><div class="employee-info" style="flex-direction:column; align-items:flex-start;"><strong>${abs.employeeName} (${abs.type})</strong><span style="font-size:0.85rem;color:#666;">${abs.start} bis ${abs.end}</span></div><button onclick="deleteAbsence(${i})" style="background:none; border:none; color:var(--danger); font-weight:bold;">X</button></div>`; });
+    }
     function addAbsence() {
-      const employeeName = document.getElementById('abs-employee').value;
-      const type = document.getElementById('abs-type').value;
-      const start = document.getElementById('abs-start').value;
-      const end = document.getElementById('abs-end').value || start; 
-      if(!employeeName || !start) return alert("Bitte Mitarbeiter und Startdatum ausfüllen!");
-      absences.push({ employeeName, type, start, end });
-      localStorage.setItem('absence_data', JSON.stringify(absences));
-      renderAbsences();
-      alert('Erfolgreich eingetragen!');
+      const e = document.getElementById('abs-employee').value, t = document.getElementById('abs-type').value, s = document.getElementById('abs-start').value, en = document.getElementById('abs-end').value || s; 
+      if(!e || !s) return alert("Fehlt!"); absences.push({ employeeName:e, type:t, start:s, end:en }); localStorage.setItem('absence_data', JSON.stringify(absences)); renderAbsences(); alert("Ok");
     }
+    function deleteAbsence(i) { absences.splice(i, 1); localStorage.setItem('absence_data', JSON.stringify(absences)); renderAbsences(); }
 
-    function deleteAbsence(index) {
-      if(confirm("Diesen Eintrag wirklich löschen?")) {
-        absences.splice(index, 1);
-        localStorage.setItem('absence_data', JSON.stringify(absences));
-        renderAbsences();
-      }
-    }
-
-    // --- GENERIEREN & ALGORITHMUS ---
+    // --- DER NEUE, PERFEKTE ALGORITHMUS ---
     function getISOWeek(date) {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
@@ -365,199 +216,201 @@
         return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 
-    function isDateInAbsence(dateStr, empName) {
+    const festeFeiertage = ['01-01', '05-01', '10-03', '12-25', '12-26'];
+    function isFeiertag(dateStr) { return festeFeiertage.includes(dateStr.substring(5, 10)); }
+    function getAbsence(dateStr, empName) {
         const d = new Date(dateStr);
         for(let abs of absences) {
             if(abs.employeeName === empName) {
-                const s = new Date(abs.start), e = new Date(abs.end);
-                if(d >= s && d <= e) return abs.type; 
+                if(d >= new Date(abs.start) && d <= new Date(abs.end)) return abs.type; 
             }
         }
-        return false;
-    }
-    
-    // Einfache Liste bundesweiter fester Feiertage (Format: MM-DD)
-    const festeFeiertage = ['01-01', '05-01', '10-03', '12-25', '12-26'];
-    function isFeiertag(dateStr) {
-        const monthDay = dateStr.substring(5, 10); // Holt "MM-DD" aus "YYYY-MM-DD"
-        return festeFeiertage.includes(monthDay);
+        return null;
     }
 
     function startGeneration() {
-        try {
-            const monthVal = document.getElementById('plan-month').value;
-            const errDiv = document.getElementById('plan-error');
-            
-            if(!monthVal) { errDiv.innerText = "Bitte wähle zuerst einen Monat aus!"; errDiv.style.display="block"; return; }
-            if(employees.length === 0) { errDiv.innerText = "Es sind keine Mitarbeiter angelegt!"; errDiv.style.display="block"; return; }
-            errDiv.style.display="none";
+        const monthVal = document.getElementById('plan-month').value;
+        const errDiv = document.getElementById('plan-error');
+        errDiv.style.display="none"; errDiv.innerHTML = "";
+        
+        if(!monthVal || employees.length === 0) return alert("Monat fehlt oder keine Mitarbeiter!");
 
-            const [year, month] = monthVal.split('-');
-            const daysInMonth = new Date(year, month, 0).getDate();
-            
-            let planData = {}; 
-            let hoursData = {}; 
-            
+        const [year, month] = monthVal.split('-');
+        const daysInMonth = new Date(year, month, 0).getDate();
+        let plan = {}; let hours = {}; let warnings = [];
+        
+        // 1. Gruppen für Schichtwechsel bilden (Paare bleiben zusammen)
+        let groupA = []; let groupB = []; let processed = new Set();
+        employees.forEach(emp => {
+            if(processed.has(emp.name)) return;
+            let partner = employees.find(e => e.name === emp.pairedWith);
+            let targetGroup = (groupA.length <= groupB.length) ? groupA : groupB;
+            targetGroup.push(emp.name); processed.add(emp.name);
+            if(partner && !processed.has(partner.name)) { targetGroup.push(partner.name); processed.add(partner.name); }
+        });
+
+        employees.forEach(emp => { plan[emp.name] = []; hours[emp.name] = { soll: 0, ist: 0 }; });
+
+        // 2. Grundgerüst bauen (Abwesenheiten, Feiertage, Sonntage eintragen)
+        for(let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${month}-${String(day).padStart(2,'0')}`;
+            const dayOfWeek = new Date(year, month-1, day).getDay();
+            const weekNumber = getISOWeek(new Date(year, month-1, day));
+            const ft = isFeiertag(dateStr);
+
             employees.forEach(emp => {
-                planData[emp.name] = [];
-                hoursData[emp.name] = { soll: 0, ist: 0 };
+                let status = "Work";
+                let abs = getAbsence(dateStr, emp.name);
+                if(dayOfWeek === 0) status = "Frei (So)";
+                else if(ft) status = "Feiertag";
+                else if(abs) status = abs; // Urlaub, Krank, Wunschfrei
+                else if(emp.freeday == dayOfWeek) status = "Frei (Fest)";
+                
+                plan[emp.name].push({ day, dateStr, dayOfWeek, weekNumber, status });
+            });
+        }
+
+        // 3. Samstag-Regelung anwenden (Max 2 freie Samstage pro Monat verteilen)
+        employees.forEach(emp => {
+            let satsOffCount = plan[emp.name].filter(d => d.dayOfWeek === 6 && (d.status === 'Urlaub' || d.status === 'Krank')).length;
+            
+            // Urlaub die ganze Woche davor? -> Samstag automatisch frei
+            plan[emp.name].filter(d => d.dayOfWeek === 6 && d.status === 'Work').forEach(sat => {
+                let prevMonToFri = plan[emp.name].filter(d => d.weekNumber === sat.weekNumber && d.dayOfWeek >= 1 && d.dayOfWeek <= 5);
+                let allUrlaub = prevMonToFri.length === 5 && prevMonToFri.every(d => d.status === 'Urlaub');
+                if(allUrlaub) { sat.status = "Frei"; satsOffCount++; }
             });
 
-            for(let day = 1; day <= daysInMonth; day++) {
-                const currentDate = new Date(year, month - 1, day);
-                const dateStr = `${year}-${month}-${String(day).padStart(2,'0')}`;
-                const dayOfWeek = currentDate.getDay(); // 0=So, 1=Mo... 6=Sa
-                const weekNumber = getISOWeek(currentDate);
-                const feiertag = isFeiertag(dateStr);
-
-                let availableToday = [];
-
-                // 1. Wer darf heute arbeiten? (Prüfung auf Frei/Urlaub/Feiertag)
-                employees.forEach(emp => {
-                    let shift = "";
-                    let absType = isDateInAbsence(dateStr, emp.name);
-                    
-                    if(dayOfWeek === 0) {
-                        shift = "Frei (So)"; 
-                    } else if(feiertag) {
-                        shift = "Feiertag"; 
-                    } else if(absType) {
-                        shift = absType; 
-                    } else if (emp.freeday == dayOfWeek) {
-                        shift = "Frei (Fest)";
-                    } else {
-                        availableToday.push(emp);
-                    }
-
-                    planData[emp.name].push({ date: dateStr, dayOfWeek, shift, weekNumber, feiertag });
+            // Restliche "2 Samstage Regel" auffüllen
+            if(emp.satRule) {
+                plan[emp.name].filter(d => d.dayOfWeek === 6 && d.status === 'Work').forEach(sat => {
+                    if(satsOffCount < 2) { sat.status = "Frei"; satsOffCount++; }
                 });
+            }
+        });
 
-                // 2. Schichten zuweisen
-                if(dayOfWeek !== 0 && !feiertag) {
-                    if(availableToday.length < (parseInt(settings.minSpaet) + 1)) {
-                        errDiv.innerText = `Achtung: Am ${day}.${month}. sind evtl. zu wenig Mitarbeiter da (nur ${availableToday.length})!`;
-                        errDiv.style.display = "block";
+        // 4. GARANTIERTE 5-TAGE-WOCHE: Dynamische freie Tage unter der Woche verteilen
+        let uniqueWeeks = [...new Set(plan[employees[0].name].map(d => d.weekNumber))];
+        
+        uniqueWeeks.forEach(week => {
+            employees.forEach(emp => {
+                let daysThisWeek = plan[emp.name].filter(d => d.weekNumber === week && d.dayOfWeek !== 0); // Mo-Sa
+                
+                // Hat er in dieser Woche schon irgendeinen freien Tag? (Urlaub, Krank, Fest, Wunschfrei, freier Samstag, Feiertag)
+                let hasDayOff = daysThisWeek.some(d => d.status !== 'Work');
+                
+                // Wenn nicht, suche einen Tag (Mo-Fr) und gib ihm frei!
+                if(!hasDayOff) {
+                    let possibleDays = daysThisWeek.filter(d => d.status === 'Work' && d.dayOfWeek >= 1 && d.dayOfWeek <= 5);
+                    if(possibleDays.length > 0) {
+                        // Nimm einfach den ersten möglichen (Man könnte hier noch Lastverteilung einbauen)
+                        possibleDays[0].status = "Frei";
+                    }
+                }
+            });
+        });
+
+        // 5. Schichten Zuweisen (Früh / Spät) & Mindestbesetzung prüfen
+        for(let day = 1; day <= daysInMonth; day++) {
+            let workingToday = employees.filter(emp => plan[emp.name][day-1].status === 'Work');
+            let dayOfWeek = plan[employees[0].name][day-1].dayOfWeek;
+            let weekNumber = plan[employees[0].name][day-1].weekNumber;
+
+            if(workingToday.length > 0) {
+                if(dayOfWeek === 6) {
+                    // Samstag: Alle Früh
+                    workingToday.forEach(emp => plan[emp.name][day-1].status = 'F');
+                } else {
+                    // Wöchentlicher Wechsel nach Gruppen
+                    workingToday.forEach(emp => {
+                        let isGroupA = groupA.includes(emp.name);
+                        let shift = "";
+                        if(weekNumber % 2 === 0) shift = isGroupA ? 'F' : 'S'; // Gerade Woche: A=Früh, B=Spät
+                        else shift = isGroupA ? 'S' : 'F'; // Ungerade Woche: A=Spät, B=Früh
+                        plan[emp.name][day-1].status = shift;
+                    });
+
+                    // Check Mindestbesetzung Spätschicht
+                    let fCount = workingToday.filter(e => plan[e.name][day-1].status === 'F').length;
+                    let sCount = workingToday.filter(e => plan[e.name][day-1].status === 'S').length;
+                    let minS = parseInt(settings.minSpaet);
+
+                    // Versuche Leute von Früh auf Spät zu schieben, wenn Spät unterbesetzt ist, ABER lass mind. 1 in Früh
+                    while(sCount < minS && fCount > 1) {
+                        let empToMove = workingToday.find(e => plan[e.name][day-1].status === 'F');
+                        if(empToMove) {
+                            plan[empToMove.name][day-1].status = 'S';
+                            fCount--; sCount++;
+                        }
                     }
 
-                    availableToday.forEach(emp => {
-                        let assignedShift = "";
-                        
-                        if(dayOfWeek === 6) {
-                            assignedShift = "F"; // Samstag immer Frühschicht
-                        } else {
-                            // Gruppen-Einteilung für Wöchentlichen Wechsel
-                            let groupHashStr = (emp.pairedWith && emp.pairedWith !== 'none') ? emp.pairedWith : emp.name;
-                            let isGroupA = groupHashStr.charCodeAt(0) % 2 === 0;
-
-                            if (weekNumber % 2 === 0) {
-                                assignedShift = isGroupA ? "F" : "S";
-                            } else {
-                                assignedShift = isGroupA ? "S" : "F";
-                            }
-                        }
-
-                        let dayEntry = planData[emp.name].find(d => d.date === dateStr);
-                        if(dayEntry) dayEntry.shift = assignedShift;
-                    });
+                    // Fehler melden, wenn es trotz Schieben nicht reicht
+                    if(sCount < minS || (fCount < 1 && workingToday.length > 0)) {
+                        warnings.push(`Am ${day}.${month}. ist die Schichtbesetzung kritisch (Früh: ${fCount}, Spät: ${sCount}).`);
+                    }
                 }
             }
-
-            // 3. Stunden berechnen
-            employees.forEach(emp => {
-                planData[emp.name].forEach(day => {
-                    const s = day.shift;
-                    const isSa = day.dayOfWeek === 6;
-                    const isWd = day.dayOfWeek >= 1 && day.dayOfWeek <= 5;
-
-                    if(day.feiertag) {
-                        if(s === 'Feiertag') { // Abwesend am Feiertag
-                            hoursData[emp.name].soll += settings.h.feiertag_frei_soll; 
-                            hoursData[emp.name].ist += settings.h.feiertag_frei_ist; 
-                        } else { // Hat gearbeitet (F/S)
-                            hoursData[emp.name].soll += settings.h.feiertag_work_soll; 
-                            hoursData[emp.name].ist += settings.h.feiertag_work_ist; 
-                        }
-                    } 
-                    else if(isWd) {
-                        if(s === 'F' || s === 'S') { 
-                            hoursData[emp.name].soll += settings.h.mofr_work_soll; hoursData[emp.name].ist += settings.h.mofr_work_ist; 
-                        }
-                        else if(s === 'Urlaub' || s === 'Krank') { 
-                            hoursData[emp.name].soll += 8; hoursData[emp.name].ist += 8; 
-                        } 
-                        else { // Wunschfrei, Frei(Fest)
-                            hoursData[emp.name].soll += settings.h.mofr_frei_soll; hoursData[emp.name].ist += settings.h.mofr_frei_ist; 
-                        }
-                    } 
-                    else if(isSa) {
-                        if(s === 'F' || s === 'S') { 
-                            hoursData[emp.name].soll += settings.h.sa_work_soll; hoursData[emp.name].ist += settings.h.sa_work_ist; 
-                        }
-                        else if(s === 'Urlaub' || s === 'Krank') { 
-                            hoursData[emp.name].soll += 0; hoursData[emp.name].ist += 0; 
-                        } 
-                        else { 
-                            hoursData[emp.name].soll += settings.h.sa_frei_soll; hoursData[emp.name].ist += settings.h.sa_frei_ist; 
-                        }
-                    }
-                });
-            });
-
-            renderTables(planData, hoursData, daysInMonth);
-        } catch(e) {
-            console.error("Fehler bei der Berechnung:", e);
-            document.getElementById('plan-error').innerText = "Systemfehler beim Berechnen. Bitte prüfe, ob in den Einstellungen alle Zahlenfelder ausgefüllt sind.";
-            document.getElementById('plan-error').style.display = "block";
         }
+
+        // 6. Stunden berechnen (Soll / Ist)
+        employees.forEach(emp => {
+            plan[emp.name].forEach(day => {
+                let s = day.status;
+                let isSa = day.dayOfWeek === 6; let isWd = day.dayOfWeek >= 1 && day.dayOfWeek <= 5;
+                let h = settings.h;
+
+                if(s === 'Feiertag') { hours[emp.name].soll += h.feiertag_frei_soll; hours[emp.name].ist += h.feiertag_frei_ist; }
+                else if(isWd) {
+                    if(s==='F'||s==='S') { hours[emp.name].soll += h.mofr_work_soll; hours[emp.name].ist += h.mofr_work_ist; }
+                    else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += 8; hours[emp.name].ist += 8; }
+                    else if(s==='Wunschfrei'||s==='Frei (Fest)'||s==='Frei') { hours[emp.name].soll += h.mofr_frei_soll; hours[emp.name].ist += h.mofr_frei_ist; }
+                } 
+                else if(isSa) {
+                    if(s==='F'||s==='S') { hours[emp.name].soll += h.sa_work_soll; hours[emp.name].ist += h.sa_work_ist; }
+                    else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += 0; hours[emp.name].ist += 0; }
+                    else if(s==='Wunschfrei'||s==='Frei') { hours[emp.name].soll += h.sa_frei_soll; hours[emp.name].ist += h.sa_frei_ist; }
+                }
+            });
+        });
+
+        // 7. Plan zeichnen
+        if(warnings.length > 0) {
+            errDiv.innerHTML = "<strong>Achtung, Konflikte:</strong><br>" + warnings.join("<br>");
+            errDiv.style.display = "block";
+        }
+        renderTables(plan, hours, daysInMonth);
     }
 
     function renderTables(planData, hoursData, daysInMonth) {
         document.getElementById('plan-result-container').style.display = "block";
 
-        // --- PLAN TABELLE ---
         let html = '<table class="plan-table"><thead><tr><th>Mitarbeiter</th>';
-        for(let d=1; d<=daysInMonth; d++) { html += `<th>${d}.</th>`; }
+        for(let d=1; d<=daysInMonth; d++) html += `<th>${d}.</th>`;
         html += '</tr></thead><tbody>';
 
         employees.forEach(emp => {
             html += `<tr><td style="text-align:left; font-weight:bold; min-width: 120px;"><div style="display:inline-block; width:10px; height:10px; background:${emp.color}; border-radius:50%; margin-right:5px;"></div>${emp.name}</td>`;
-            
             planData[emp.name].forEach(day => {
-                let cssClass = "";
-                let text = day.shift;
-                
-                if(text === 'F') cssClass = "cell-frueh";
-                else if(text === 'S') cssClass = "cell-spaet";
-                else if(text === 'Frei (So)') { cssClass = "cell-we"; text = "-"; }
-                else if(text === 'Feiertag') { cssClass = "cell-feiertag"; text = "FT"; }
-                else if(text === 'Urlaub') { cssClass = "cell-urlaub"; text = "U"; }
-                else if(text === 'Krank') { cssClass = "cell-krank"; text = "K"; }
-                else { cssClass = "cell-frei"; text = "Frei"; }
-
+                let cssClass = "", text = day.status;
+                if(text === 'F') cssClass = "cell-frueh"; else if(text === 'S') cssClass = "cell-spaet";
+                else if(text === 'Frei (So)') { cssClass = "cell-we"; text = "-"; } else if(text === 'Feiertag') { cssClass = "cell-feiertag"; text = "FT"; }
+                else if(text === 'Urlaub') { cssClass = "cell-urlaub"; text = "U"; } else if(text === 'Krank') { cssClass = "cell-krank"; text = "K"; }
+                else if(text === 'Frei (Fest)' || text === 'Frei' || text === 'Wunschfrei') { cssClass = "cell-frei"; text = "Frei"; }
                 html += `<td class="${cssClass}">${text}</td>`;
             });
             html += '</tr>';
         });
-        html += '</tbody></table>';
-        document.getElementById('plan-table-wrapper').innerHTML = html;
+        html += '</tbody></table>'; document.getElementById('plan-table-wrapper').innerHTML = html;
 
-        // --- STUNDEN TABELLE ---
-        let hHtml = '<table class="plan-table" style="width:auto; min-width:300px; margin-top:0;"><thead><tr><th>Mitarbeiter</th><th>Soll (h)</th><th>Ist (h)</th><th>Differenz</th></tr></thead><tbody>';
+        let hHtml = '<table class="plan-table" style="width:auto; min-width:300px; margin-top:0;"><thead><tr><th>Mitarbeiter</th><th>Soll (h)</th><th>Ist (h)</th><th>Diff</th></tr></thead><tbody>';
         employees.forEach(emp => {
-            const h = hoursData[emp.name];
-            const diff = h.ist - h.soll;
-            const diffColor = diff < 0 ? 'color:red;' : (diff > 0 ? 'color:green;' : '');
-            hHtml += `<tr><td style="text-align:left;">${emp.name}</td><td>${h.soll.toFixed(1)}</td><td>${h.ist.toFixed(1)}</td><td style="font-weight:bold; ${diffColor}">${diff > 0 ? '+'+diff.toFixed(1) : diff.toFixed(1)}</td></tr>`;
+            const h = hoursData[emp.name]; const diff = h.ist - h.soll; const c = diff < 0 ? 'color:red;' : (diff > 0 ? 'color:green;' : '');
+            hHtml += `<tr><td style="text-align:left;">${emp.name}</td><td>${h.soll.toFixed(1)}</td><td>${h.ist.toFixed(1)}</td><td style="font-weight:bold; ${c}">${diff > 0 ? '+'+diff.toFixed(1) : diff.toFixed(1)}</td></tr>`;
         });
-        hHtml += '</tbody></table>';
-        document.getElementById('hours-table-wrapper').innerHTML = hHtml;
+        hHtml += '</tbody></table>'; document.getElementById('hours-table-wrapper').innerHTML = hHtml;
     }
 
-    // Init beim Start
-    renderEmployees(); 
-    renderAbsences(); 
-    loadSettingsToForm();
-
+    renderEmployees(); renderAbsences(); loadSettingsToForm();
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
   </script>
 </body>
