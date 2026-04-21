@@ -85,7 +85,6 @@
         .print-title { display: block !important; font-size: 14pt; font-weight: bold; margin-bottom: 10px; margin-top: 20px; }
     }
     
-    /* Die Print-Title-Klasse ist auf dem Bildschirm unsichtbar */
     .print-title { display: none; }
   </style>
 </head>
@@ -141,7 +140,7 @@
             <div class="table-container" id="hours-table-wrapper"></div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 1rem;">
-            <button class="primary-btn" onclick="saveCurrentPlan()" style="background-color: #28a745;">Plan speichern</button>
+            <button class="primary-btn" onclick="saveCurrentPlan()" style="background-color: #28a745;">Plan im Archiv speichern</button>
             <button class="primary-btn" onclick="window.print()" style="background-color: #17a2b8;">PDF / Drucken</button>
         </div>
       </div>
@@ -188,22 +187,10 @@
 
       <div class="card">
         <h3>Schichtzeiten & Besetzung</h3>
-        <div class="form-group">
-          <label>Frühschicht (Start - Ende)</label>
-          <div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div>
-        </div>
-        <div class="form-group">
-          <label>Spätschicht (Start - Ende)</label>
-          <div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div>
-        </div>
-        <div class="form-group">
-          <label>Samstags-Schicht (Start - Ende)</label>
-          <div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div>
-        </div>
-        <div class="form-group">
-          <label>Mindestbesetzung Spätschicht</label>
-          <input type="number" id="set-min-spaet" value="2">
-        </div>
+        <div class="form-group"><label>Frühschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div></div>
+        <div class="form-group"><label>Spätschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div></div>
+        <div class="form-group"><label>Samstags-Schicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div></div>
+        <div class="form-group"><label>Mindestbesetzung Spätschicht</label><input type="number" id="set-min-spaet" value="2"></div>
       </div>
 
       <div class="card">
@@ -211,34 +198,16 @@
         <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Urlaub und Krankheit (Mo-Fr: 8h, Sa: 0h) sind fest im Code hinterlegt und schützen vor Minusstunden.</p>
         
         <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Reguläre Tage (Mo-Fr)</h4>
-        <div class="form-group">
-          <label>Mo-Fr anwesend</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-work-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-          <label>Mo-Fr abwesend (Wunschfrei / Fest-frei)</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-frei-ist" placeholder="Ist"></div>
-        </div>
+        <div class="form-group"><label>Mo-Fr anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Mo-Fr abwesend (Wunschfrei / Fest-frei)</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-frei-ist" placeholder="Ist"></div></div>
         
         <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Samstage</h4>
-        <div class="form-group">
-          <label>Samstag anwesend</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-work-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-          <label>Samstag abwesend (Wunschfrei / Frei)</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-frei-ist" placeholder="Ist"></div>
-        </div>
+        <div class="form-group"><label>Samstag anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Samstag abwesend (Wunschfrei / Frei)</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-frei-ist" placeholder="Ist"></div></div>
         
         <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Feiertage & Sondertage</h4>
-        <div class="form-group">
-          <label>Feiertage anwesend</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-work-ist" placeholder="Ist"></div>
-        </div>
-        <div class="form-group">
-          <label>Feiertage abwesend</label>
-          <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-frei-ist" placeholder="Ist"></div>
-        </div>
+        <div class="form-group"><label>Feiertage anwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Feiertage abwesend</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-frei-ist" placeholder="Ist"></div></div>
         
         <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Einstellungen speichern</button>
       </div>
@@ -283,7 +252,7 @@
     const defaultHours = { mofr_work_soll: 8, mofr_work_ist: 8, mofr_frei_soll: 8, mofr_frei_ist: 0, sa_work_soll: 0, sa_work_ist: 8, sa_frei_soll: 0, sa_frei_ist: 0, feiertag_work_soll: 0, feiertag_work_ist: 8, feiertag_frei_soll: 0, feiertag_frei_ist: 0 };
     for(let key in defaultHours) { if(settings.h[key] === undefined) settings.h[key] = defaultHours[key]; }
 
-    // --- SETUP, TEAM, URLAUB ---
+    // --- SETUP, TEAM, URLAUB (Logik) ---
     function loadSettingsToForm() {
         document.getElementById('set-state').value = settings.state; document.getElementById('set-frueh-start').value = settings.fruehStart; document.getElementById('set-frueh-end').value = settings.fruehEnd; document.getElementById('set-spaet-start').value = settings.spaetStart; document.getElementById('set-spaet-end').value = settings.spaetEnd; document.getElementById('set-sa-start').value = settings.saStart; document.getElementById('set-sa-end').value = settings.saEnd; document.getElementById('set-min-spaet').value = settings.minSpaet;
         document.getElementById('h-mofr-work-soll').value = settings.h.mofr_work_soll; document.getElementById('h-mofr-work-ist').value = settings.h.mofr_work_ist; document.getElementById('h-mofr-frei-soll').value = settings.h.mofr_frei_soll; document.getElementById('h-mofr-frei-ist').value = settings.h.mofr_frei_ist; document.getElementById('h-sa-work-soll').value = settings.h.sa_work_soll; document.getElementById('h-sa-work-ist').value = settings.h.sa_work_ist; document.getElementById('h-sa-frei-soll').value = settings.h.sa_frei_soll; document.getElementById('h-sa-frei-ist').value = settings.h.sa_frei_ist; document.getElementById('h-feiertag-work-soll').value = settings.h.feiertag_work_soll; document.getElementById('h-feiertag-work-ist').value = settings.h.feiertag_work_ist; document.getElementById('h-feiertag-frei-soll').value = settings.h.feiertag_frei_soll; document.getElementById('h-feiertag-frei-ist').value = settings.h.feiertag_frei_ist;
@@ -395,225 +364,243 @@
     }
 
     function startGeneration() {
-        const monthVal = document.getElementById('plan-month').value;
         const errDiv = document.getElementById('plan-error');
         errDiv.style.display="none"; errDiv.innerHTML = "";
         
-        if(!monthVal || employees.length === 0) return alert("Bitte wähle einen Monat aus und lege Mitarbeiter an!");
+        try {
+            const monthVal = document.getElementById('plan-month').value;
+            if(!monthVal || employees.length === 0) return alert("Bitte wähle einen Monat aus und lege Mitarbeiter an!");
 
-        const [yearStr, monthStr] = monthVal.split('-');
-        const yearInt = parseInt(yearStr);
-        const monthIndex = parseInt(monthStr) - 1; 
-        
-        let feiertage = getAllFeiertage(yearInt, settings.state).concat(getAllFeiertage(yearInt - 1, settings.state));
-
-        let firstDayOfMonth = new Date(yearInt, monthIndex, 1);
-        let spanStart = new Date(firstDayOfMonth);
-        let startDayOfWeek = spanStart.getDay() || 7;
-        spanStart.setDate(spanStart.getDate() - (startDayOfWeek - 1)); 
-
-        let lastDayOfMonth = new Date(yearInt, monthIndex + 1, 0);
-        let spanEnd = new Date(lastDayOfMonth);
-        let endDayOfWeek = spanEnd.getDay() || 7;
-        spanEnd.setDate(spanEnd.getDate() + (7 - endDayOfWeek)); 
-
-        let plan = {}; let hours = {}; let warnings = [];
-        let groupA = []; let groupB = []; let processed = new Set();
-        
-        employees.forEach(emp => {
-            plan[emp.name] = []; hours[emp.name] = { soll: 0, ist: 0 };
-            if(processed.has(emp.name)) return;
-            let partner = employees.find(e => e.name === emp.pairedWith);
-            let targetGroup = (groupA.length <= groupB.length) ? groupA : groupB;
-            targetGroup.push(emp.name); processed.add(emp.name);
-            if(partner && !processed.has(partner.name)) { targetGroup.push(partner.name); processed.add(partner.name); }
-        });
-
-        let currentDate = new Date(spanStart);
-        while(currentDate <= spanEnd) {
-            const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
-            const dayOfWeek = currentDate.getDay();
-            const weekNumber = getISOWeek(currentDate);
-            const ft = feiertage.includes(dateStr);
-            const isCurrentMonth = (currentDate.getMonth() === monthIndex && currentDate.getFullYear() === yearInt);
-
-            employees.forEach(emp => {
-                let status = "Work";
-                let isLocked = false;
-
-                for (let key in savedPlans) {
-                    if (savedPlans[key].plan[emp.name]) {
-                        let savedDay = savedPlans[key].plan[emp.name].find(d => d.dateStr === dateStr);
-                        if (savedDay) {
-                            status = savedDay.status;
-                            isLocked = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!isLocked) {
-                    let abs = getAbsence(dateStr, emp.name);
-                    if(dayOfWeek === 0) status = "Frei (So)";
-                    else if(ft) status = "Feiertag";
-                    else if(abs) status = abs; 
-                    else if(emp.freeday == dayOfWeek) status = "Frei (Fest)";
-                }
-                
-                plan[emp.name].push({ dateStr, dayOfWeek, weekNumber, status, isCurrentMonth, isLocked });
-            });
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        // 2. Faire Samstags-Regelung
-        employees.forEach(emp => {
-            if(emp.satRule) {
-                let allSats = plan[emp.name].filter(d => d.dayOfWeek === 6 && !d.isLocked);
-                let satsByMonth = {};
-                allSats.forEach(sat => {
-                    let mStr = sat.dateStr.substring(0, 7);
-                    if (!satsByMonth[mStr]) satsByMonth[mStr] = [];
-                    satsByMonth[mStr].push(sat);
-                });
-
-                for (let m in satsByMonth) {
-                    let mSats = satsByMonth[m];
-                    let totalSatsInMonth = plan[emp.name].filter(d => d.dayOfWeek === 6 && d.dateStr.startsWith(m));
-                    let satsOff = totalSatsInMonth.filter(d => d.status !== 'Work').length;
-                    let needed = Math.floor(totalSatsInMonth.length / 2);
-
-                    while(needed > satsOff) {
-                        let availableSats = mSats.filter(sat => {
-                            if (sat.status !== 'Work') return false;
-                            let prevWd = plan[emp.name].filter(d => d.weekNumber === sat.weekNumber && d.dayOfWeek >= 1 && d.dayOfWeek <= 5);
-                            let hasFreiAlready = prevWd.some(d => ['Frei', 'Frei (Fest)', 'Wunschfrei'].includes(d.status));
-                            return !hasFreiAlready; 
-                        });
-
-                        if (availableSats.length === 0) {
-                            availableSats = mSats.filter(d => d.status === 'Work');
-                            if (availableSats.length === 0) break;
-                        }
-
-                        let bestSat = null; let maxStaff = -1;
-                        availableSats.forEach(sat => {
-                            let staff = employees.filter(e => plan[e.name].find(x => x.dateStr === sat.dateStr).status === 'Work').length;
-                            if(staff > maxStaff) { maxStaff = staff; bestSat = sat; }
-                        });
-                        if(bestSat) { bestSat.status = "Frei"; satsOff++; } else break;
-                    }
-                }
-            }
-        });
-
-        // 3. Strikte 5-Tage-Woche mit der "Max 1 Frei pro Tag" Regel!
-        let uniqueWeeks = [...new Set(plan[employees[0].name].map(d => d.weekNumber))];
-        uniqueWeeks.forEach(week => {
-            employees.forEach(emp => {
-                let weekDays = plan[emp.name].filter(d => d.weekNumber === week && d.dayOfWeek >= 1 && d.dayOfWeek <= 6); 
-                let activeDays = weekDays.filter(d => ['Work', 'Urlaub', 'Krank', 'Feiertag'].includes(d.status)).length;
-                
-                while (activeDays > 5) {
-                    let possibleOff = weekDays.filter(d => d.status === 'Work' && d.dayOfWeek >= 1 && d.dayOfWeek <= 5 && !d.isLocked);
-                    if(possibleOff.length === 0) break;
-                    
-                    // REGEL: Nur Tage nehmen, an denen noch niemand "Frei" hat!
-                    let strictlyPossible = possibleOff.filter(d => {
-                        let countFrei = employees.filter(e => {
-                            let s = plan[e.name].find(x => x.dateStr === d.dateStr).status;
-                            return s === 'Frei' || s === 'Frei (Fest)' || s === 'Wunschfrei';
-                        }).length;
-                        return countFrei === 0;
-                    });
-                    
-                    let candidates = strictlyPossible.length > 0 ? strictlyPossible : possibleOff;
-                    
-                    let bestDay = null; let maxCoverage = -1;
-                    candidates.forEach(d => {
-                        let coverage = employees.filter(e => plan[e.name].find(x => x.dateStr === d.dateStr).status === 'Work').length;
-                        // Kein +100 Gewicht mehr! Rein faire Verteilung!
-                        if(coverage > maxCoverage) { maxCoverage = coverage; bestDay = d; }
-                    });
-                    if(bestDay) { bestDay.status = 'Frei'; activeDays--; } else break;
-                }
-            });
-        });
-
-        // 4. Schichten verteilen (mit der 3-Mann-Notfall Regel)
-        let allDates = [...new Set(plan[employees[0].name].map(d => d.dateStr))];
-        allDates.forEach(dStr => {
-            let working = employees.filter(emp => plan[emp.name].find(d => d.dateStr === dStr).status === 'Work');
-            let dayObj = plan[employees[0].name].find(d => d.dateStr === dStr);
+            const [yearStr, monthStr] = monthVal.split('-');
+            const yearInt = parseInt(yearStr);
+            const monthIndex = parseInt(monthStr) - 1; 
             
-            if(working.length > 0) {
-                if(dayObj.dayOfWeek === 6) {
-                    working.forEach(emp => {
-                        let item = plan[emp.name].find(d => d.dateStr === dStr);
-                        if (!item.isLocked) item.status = 'F';
-                    });
-                } else {
-                    working.forEach(emp => {
-                        let item = plan[emp.name].find(d => d.dateStr === dStr);
-                        if (!item.isLocked) {
-                            let isA = groupA.includes(emp.name);
-                            item.status = (dayObj.weekNumber % 2 === 0) ? (isA ? 'F' : 'S') : (isA ? 'S' : 'F');
-                        }
-                    });
-                    
-                    let fTeam = working.filter(e => plan[e.name].find(d => d.dateStr === dStr).status === 'F');
-                    let sTeam = working.filter(e => plan[e.name].find(d => d.dateStr === dStr).status === 'S');
-                    
-                    // DIE NEUE REGEL: Wenn exakt 3 arbeiten, IMMER 1 Früh und 2 Spät erzwingen
-                    if(working.length === 3) {
-                        while (fTeam.length > 1) {
-                            let mIdx = fTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
-                            if(mIdx !== -1) { let m = fTeam.splice(mIdx, 1)[0]; plan[m.name].find(d => d.dateStr === dStr).status = 'S'; sTeam.push(m); } else break;
-                        }
-                        while (fTeam.length < 1 && sTeam.length > 2) {
-                            let mIdx = sTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
-                            if(mIdx !== -1) { let m = sTeam.splice(mIdx, 1)[0]; plan[m.name].find(d => d.dateStr === dStr).status = 'F'; fTeam.push(m); } else break;
-                        }
-                    } else {
-                        // Reguläres Load Balancing
-                        while(sTeam.length < settings.minSpaet && fTeam.length > 1) {
-                            let moverIndex = fTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
-                            if (moverIndex !== -1) { let mover = fTeam.splice(moverIndex, 1)[0]; plan[mover.name].find(d => d.dateStr === dStr).status = 'S'; sTeam.push(m); } else break; 
-                        }
-                    }
-                    
-                    if(dayObj.isCurrentMonth && (sTeam.length < settings.minSpaet || fTeam.length < 1)) {
-                        warnings.push(`Am ${dStr.substring(8,10)}.${dStr.substring(5,7)}.: Kritische Besetzung (F:${fTeam.length}, S:${sTeam.length})`);
-                    }
-                }
-            }
-        });
+            let feiertage = getAllFeiertage(yearInt, settings.state).concat(getAllFeiertage(yearInt - 1, settings.state));
 
-        // 5. Filtern und Stunden
-        let displayPlan = {};
-        employees.forEach(emp => {
-            displayPlan[emp.name] = plan[emp.name].filter(d => d.isCurrentMonth);
-            displayPlan[emp.name].forEach(day => {
-                let s = day.status; let isSa = day.dayOfWeek === 6; let isWd = day.dayOfWeek >= 1 && day.dayOfWeek <= 5; let h = settings.h;
-                if(s === 'Feiertag') { hours[emp.name].soll += h.feiertag_frei_soll; hours[emp.name].ist += h.feiertag_frei_ist; }
-                else if(isWd) {
-                    if(s==='F'||s==='S') { hours[emp.name].soll += h.mofr_work_soll; hours[emp.name].ist += h.mofr_work_ist; }
-                    else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += h.mofr_work_soll; hours[emp.name].ist += h.mofr_work_soll; }
-                    else { hours[emp.name].soll += h.mofr_frei_soll; hours[emp.name].ist += h.mofr_frei_ist; }
-                } 
-                else if(isSa) {
-                    if(s==='F'||s==='S') { hours[emp.name].soll += h.sa_work_soll; hours[emp.name].ist += h.sa_work_ist; }
-                    else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += h.sa_work_soll; hours[emp.name].ist += h.sa_work_soll; }
-                    else { hours[emp.name].soll += h.sa_frei_soll; hours[emp.name].ist += h.sa_frei_ist; }
+            let firstDayOfMonth = new Date(yearInt, monthIndex, 1);
+            let spanStart = new Date(firstDayOfMonth);
+            let startDayOfWeek = spanStart.getDay() || 7;
+            spanStart.setDate(spanStart.getDate() - (startDayOfWeek - 1)); 
+
+            let lastDayOfMonth = new Date(yearInt, monthIndex + 1, 0);
+            let spanEnd = new Date(lastDayOfMonth);
+            let endDayOfWeek = spanEnd.getDay() || 7;
+            spanEnd.setDate(spanEnd.getDate() + (7 - endDayOfWeek)); 
+
+            let plan = {}; let hours = {}; let warnings = [];
+            let groupA = []; let groupB = []; let processed = new Set();
+            
+            employees.forEach(emp => {
+                plan[emp.name] = []; hours[emp.name] = { soll: 0, ist: 0 };
+                if(processed.has(emp.name)) return;
+                let partner = employees.find(e => e.name === emp.pairedWith);
+                let targetGroup = (groupA.length <= groupB.length) ? groupA : groupB;
+                targetGroup.push(emp.name); processed.add(emp.name);
+                if(partner && !processed.has(partner.name)) { targetGroup.push(partner.name); processed.add(partner.name); }
+            });
+
+            let currentDate = new Date(spanStart);
+            while(currentDate <= spanEnd) {
+                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+                const dayOfWeek = currentDate.getDay();
+                const weekNumber = getISOWeek(currentDate);
+                const ft = feiertage.includes(dateStr);
+                const isCurrentMonth = (currentDate.getMonth() === monthIndex && currentDate.getFullYear() === yearInt);
+
+                employees.forEach(emp => {
+                    let status = "Work";
+                    let isLocked = false;
+
+                    for (let key in savedPlans) {
+                        if (savedPlans[key].plan[emp.name]) {
+                            let savedDay = savedPlans[key].plan[emp.name].find(d => d.dateStr === dateStr);
+                            if (savedDay) {
+                                status = savedDay.status;
+                                isLocked = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!isLocked) {
+                        let abs = getAbsence(dateStr, emp.name);
+                        if(dayOfWeek === 0) status = "Frei (So)";
+                        else if(ft) status = "Feiertag";
+                        else if(abs) status = abs; 
+                        else if(emp.freeday == dayOfWeek) status = "Frei (Fest)";
+                    }
+                    
+                    plan[emp.name].push({ dateStr, dayOfWeek, weekNumber, status, isCurrentMonth, isLocked });
+                });
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // 2. Faire Samstags-Regelung
+            employees.forEach(emp => {
+                if(emp.satRule) {
+                    let allSats = plan[emp.name].filter(d => d.dayOfWeek === 6 && !d.isLocked);
+                    let satsByMonth = {};
+                    allSats.forEach(sat => {
+                        let mStr = sat.dateStr.substring(0, 7);
+                        if (!satsByMonth[mStr]) satsByMonth[mStr] = [];
+                        satsByMonth[mStr].push(sat);
+                    });
+
+                    for (let m in satsByMonth) {
+                        let mSats = satsByMonth[m];
+                        
+                        let totalSatsInMonth = plan[emp.name].filter(d => d.dayOfWeek === 6 && d.dateStr.startsWith(m));
+                        let satsOff = totalSatsInMonth.filter(d => d.status !== 'Work').length;
+                        let needed = Math.floor(totalSatsInMonth.length / 2);
+
+                        while(needed > satsOff) {
+                            let availableSats = mSats.filter(sat => {
+                                if (sat.status !== 'Work') return false;
+                                let prevWd = plan[emp.name].filter(d => d.weekNumber === sat.weekNumber && d.dayOfWeek >= 1 && d.dayOfWeek <= 5);
+                                let hasFreiAlready = prevWd.some(d => ['Frei', 'Frei (Fest)', 'Wunschfrei'].includes(d.status));
+                                return !hasFreiAlready; 
+                            });
+
+                            if (availableSats.length === 0) {
+                                availableSats = mSats.filter(d => d.status === 'Work');
+                                if (availableSats.length === 0) break;
+                            }
+
+                            let bestSat = null; let maxStaff = -1;
+                            availableSats.forEach(sat => {
+                                let staff = employees.filter(e => plan[e.name].find(x => x.dateStr === sat.dateStr).status === 'Work').length;
+                                if(staff > maxStaff) { maxStaff = staff; bestSat = sat; }
+                            });
+                            if(bestSat) { bestSat.status = "Frei"; satsOff++; } else break;
+                        }
+                    }
                 }
             });
-        });
 
-        if(warnings.length > 0) { errDiv.innerHTML = "<strong>Besetzung prüfen:</strong><br>" + [...new Set(warnings)].join("<br>"); errDiv.style.display = "block"; }
-        
-        currentGeneratedPlan = { monthVal, plan: displayPlan, hours, daysInMonth: new Date(yearInt, monthIndex + 1, 0).getDate() };
-        
-        document.getElementById('print-title-new').innerText = `Dienstplan: ${monthVal}`;
-        renderTables(displayPlan, hours, currentGeneratedPlan.daysInMonth, 'plan-table-wrapper', 'hours-table-wrapper');
+            // 3. Strikte 5-Tage-Woche (Niemals zu zweit frei geben)
+            let uniqueWeeks = [...new Set(plan[employees[0].name].map(d => d.weekNumber))];
+            uniqueWeeks.forEach(week => {
+                employees.forEach(emp => {
+                    let weekDays = plan[emp.name].filter(d => d.weekNumber === week && d.dayOfWeek >= 1 && d.dayOfWeek <= 6); 
+                    let activeDays = weekDays.filter(d => ['Work', 'Urlaub', 'Krank', 'Feiertag'].includes(d.status)).length;
+                    
+                    while (activeDays > 5) {
+                        let possibleOff = weekDays.filter(d => d.status === 'Work' && d.dayOfWeek >= 1 && d.dayOfWeek <= 5 && !d.isLocked);
+                        if(possibleOff.length === 0) break;
+                        
+                        // NEUE REGEL: Ausschließlich Tage, an denen noch NIEMAND "Frei" (oder Fest-Frei) hat!
+                        let strictlyPossible = possibleOff.filter(d => {
+                            let countFrei = employees.filter(e => {
+                                let s = plan[e.name].find(x => x.dateStr === d.dateStr).status;
+                                return s === 'Frei' || s === 'Frei (Fest)' || s === 'Wunschfrei';
+                            }).length;
+                            return countFrei === 0;
+                        });
+                        
+                        let candidates = strictlyPossible.length > 0 ? strictlyPossible : possibleOff;
+                        
+                        let bestDay = null; let maxCoverage = -1;
+                        candidates.forEach(d => {
+                            let coverage = employees.filter(e => plan[e.name].find(x => x.dateStr === d.dateStr).status === 'Work').length;
+                            if(coverage > maxCoverage) { maxCoverage = coverage; bestDay = d; }
+                        });
+                        if(bestDay) { bestDay.status = 'Frei'; activeDays--; } else break;
+                    }
+                });
+            });
+
+            // 4. Schichten verteilen (mit der 3-Mann-Notfall Regel)
+            let allDates = [...new Set(plan[employees[0].name].map(d => d.dateStr))];
+            allDates.forEach(dStr => {
+                let working = employees.filter(emp => plan[emp.name].find(d => d.dateStr === dStr).status === 'Work');
+                let dayObj = plan[employees[0].name].find(d => d.dateStr === dStr);
+                
+                if(working.length > 0) {
+                    if(dayObj.dayOfWeek === 6) {
+                        working.forEach(emp => {
+                            let item = plan[emp.name].find(d => d.dateStr === dStr);
+                            if (!item.isLocked) item.status = 'F';
+                        });
+                    } else {
+                        working.forEach(emp => {
+                            let item = plan[emp.name].find(d => d.dateStr === dStr);
+                            if (!item.isLocked) {
+                                let isA = groupA.includes(emp.name);
+                                item.status = (dayObj.weekNumber % 2 === 0) ? (isA ? 'F' : 'S') : (isA ? 'S' : 'F');
+                            }
+                        });
+                        
+                        let fTeam = working.filter(e => plan[e.name].find(d => d.dateStr === dStr).status === 'F');
+                        let sTeam = working.filter(e => plan[e.name].find(d => d.dateStr === dStr).status === 'S');
+                        
+                        // DIE NEUE REGEL: Wenn exakt 3 arbeiten, IMMER 1 Früh und 2 Spät erzwingen
+                        if(working.length === 3) {
+                            while (fTeam.length > 1) {
+                                let mIdx = fTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
+                                if(mIdx !== -1) { 
+                                    let mover = fTeam.splice(mIdx, 1)[0]; 
+                                    plan[mover.name].find(d => d.dateStr === dStr).status = 'S'; 
+                                    sTeam.push(mover); 
+                                } else break;
+                            }
+                            while (fTeam.length < 1 && sTeam.length > 2) {
+                                let mIdx = sTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
+                                if(mIdx !== -1) { 
+                                    let mover = sTeam.splice(mIdx, 1)[0]; 
+                                    plan[mover.name].find(d => d.dateStr === dStr).status = 'F'; 
+                                    fTeam.push(mover); 
+                                } else break;
+                            }
+                        } else {
+                            // Reguläres Load Balancing
+                            while(sTeam.length < settings.minSpaet && fTeam.length > 1) {
+                                let mIdx = fTeam.findIndex(e => !plan[e.name].find(d => d.dateStr === dStr).isLocked);
+                                if (mIdx !== -1) { 
+                                    let mover = fTeam.splice(mIdx, 1)[0]; 
+                                    plan[mover.name].find(d => d.dateStr === dStr).status = 'S'; 
+                                    sTeam.push(mover); 
+                                } else break; 
+                            }
+                        }
+                        
+                        if(dayObj.isCurrentMonth && (sTeam.length < settings.minSpaet || fTeam.length < 1)) {
+                            warnings.push(`Am ${dStr.substring(8,10)}.${dStr.substring(5,7)}.: Kritische Besetzung (F:${fTeam.length}, S:${sTeam.length})`);
+                        }
+                    }
+                }
+            });
+
+            // 5. Filtern und Stunden
+            let displayPlan = {};
+            employees.forEach(emp => {
+                displayPlan[emp.name] = plan[emp.name].filter(d => d.isCurrentMonth);
+                displayPlan[emp.name].forEach(day => {
+                    let s = day.status; let isSa = day.dayOfWeek === 6; let isWd = day.dayOfWeek >= 1 && day.dayOfWeek <= 5; let h = settings.h;
+                    if(s === 'Feiertag') { hours[emp.name].soll += h.feiertag_frei_soll; hours[emp.name].ist += h.feiertag_frei_ist; }
+                    else if(isWd) {
+                        if(s==='F'||s==='S') { hours[emp.name].soll += h.mofr_work_soll; hours[emp.name].ist += h.mofr_work_ist; }
+                        else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += h.mofr_work_soll; hours[emp.name].ist += h.mofr_work_soll; }
+                        else { hours[emp.name].soll += h.mofr_frei_soll; hours[emp.name].ist += h.mofr_frei_ist; }
+                    } 
+                    else if(isSa) {
+                        if(s==='F'||s==='S') { hours[emp.name].soll += h.sa_work_soll; hours[emp.name].ist += h.sa_work_ist; }
+                        else if(s==='Urlaub'||s==='Krank') { hours[emp.name].soll += h.sa_work_soll; hours[emp.name].ist += h.sa_work_soll; }
+                        else { hours[emp.name].soll += h.sa_frei_soll; hours[emp.name].ist += h.sa_frei_ist; }
+                    }
+                });
+            });
+
+            if(warnings.length > 0) { errDiv.innerHTML = "<strong>Besetzung prüfen:</strong><br>" + [...new Set(warnings)].join("<br>"); errDiv.style.display = "block"; }
+            
+            currentGeneratedPlan = { monthVal, plan: displayPlan, hours, daysInMonth: new Date(yearInt, monthIndex + 1, 0).getDate() };
+            
+            document.getElementById('print-title-new').innerText = `Dienstplan: ${monthVal}`;
+            renderTables(displayPlan, hours, currentGeneratedPlan.daysInMonth, 'plan-table-wrapper', 'hours-table-wrapper');
+        } catch(e) {
+            errDiv.innerHTML = "<strong>Systemfehler bei der Berechnung!</strong><br>Fehlercode: " + e.message;
+            errDiv.style.display = "block";
+            console.error(e);
+        }
     }
 
     function renderTables(pData, hData, dInM, pId, hId) {
