@@ -6,6 +6,7 @@
   <title>Dienstplan Generator Pro</title>
   <link rel="manifest" href="manifest.json">
   <style>
+    /* DESIGN & LAYOUT */
     :root {
       --primary: #007bff;
       --bg-light: #f4f7f6;
@@ -147,9 +148,15 @@
     <section id="einstellungen" class="tab-content">
       <div class="card">
         <h3>Setup</h3>
-        <div class="form-group"><label>Bundesland</label>
+        <div class="form-group">
+          <label>Bundesland</label>
           <select id="set-state">
-            <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option><option value="BE">Berlin</option><option value="NW" selected>Nordrhein-Westfalen</option>
+            <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option><option value="BE">Berlin</option>
+            <option value="BB">Brandenburg</option><option value="HB">Bremen</option><option value="HH">Hamburg</option>
+            <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option><option value="NI">Niedersachsen</option>
+            <option value="NW" selected>Nordrhein-Westfalen</option><option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
+            <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option><option value="SH">Schleswig-Holstein</option>
+            <option value="TH">Thüringen</option>
           </select>
         </div>
         <div class="form-group"><label>Min. Spätbesetzung</label><input type="number" id="set-min-spaet" value="2"></div>
@@ -167,16 +174,18 @@
   </nav>
 
   <script>
+    // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        navButtons.forEach(b => b.classList.remove('active'));
+        navButtons.forEach(b => b.classList.remove('active')); tabContents.forEach(c => c.classList.remove('active'));
         btn.classList.add('active'); document.getElementById(btn.getAttribute('data-target')).classList.add('active');
         document.getElementById('app-title').innerText = btn.innerText;
       });
     });
 
+    // --- DATEN INIT ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
     let settings = JSON.parse(localStorage.getItem('app_settings')) || { state: 'NW', minSpaet: 2 };
@@ -191,7 +200,7 @@
     }
 
     function renderEmployees() {
-      const list = document.getElementById('employee-list'); list.innerHTML = '';
+      const list = document.getElementById('employee-list'); if(!list) return; list.innerHTML = '';
       employees.forEach((emp, i) => {
         list.innerHTML += `<div class="employee-item"><div class="employee-info"><div class="color-dot" style="background:${emp.color}"></div><strong>${emp.name}</strong></div><div><button onclick="editEmployee(${i})" style="color:var(--primary);margin-right:10px;background:none;border:none;">Edit</button><button class="delete-btn" onclick="deleteEmployee(${i})">Löschen</button></div></div>`;
       });
@@ -228,19 +237,18 @@
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
         return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(),0,1))) / 86400000) + 1)/7);
     }
-
     function getEasterDate(y) {
         const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;
-        return new Date(y, Math.floor(n/31)-1, (n%31)+1);
+        return new Date(y, Math.floor(n / 31) - 1, (n % 31) + 1);
     }
-
     function getAllFeiertage(y, s) {
         const f = []; const add = (d,m) => f.push(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
         add(1,1); add(1,5); add(3,10); add(25,12); add(26,12);
         const e = getEasterDate(y);
         const addRel = (o) => { const r = new Date(e); r.setDate(e.getDate()+o); f.push(`${r.getFullYear()}-${String(r.getMonth()+1).padStart(2,'0')}-${String(r.getDate()).padStart(2,'0')}`); };
         addRel(-2); addRel(1); addRel(39); addRel(50);
-        if(s === 'NW') { addRel(60); add(1,11); }
+        if(['BW','BY','NW','RP','SL','HE'].includes(s)) addRel(60);
+        if(['BW','BY','NW','RP','SL'].includes(s)) add(1,11);
         return f;
     }
 
@@ -248,142 +256,131 @@
         const monthVal = document.getElementById('plan-month').value;
         if(!monthVal || employees.length === 0) return alert("Wähle Monat und lege Team an!");
         const [year, month] = monthVal.split('-').map(Number);
-        
-        let feiertage = getAllFeiertage(year, settings.state).concat(getAllFeiertage(year-1, settings.state));
-        
-        // Berechnungszeitraum: 1 Woche vor Monatsersten bis Ende des Monats
-        let start = new Date(year, month-1, 1);
-        start.setDate(start.getDate() - (start.getDay() || 7)); // Letzter Montag davor
-        let end = new Date(year, month, 0);
-        end.setDate(end.getDate() + (7 - (end.getDay() || 7))); // Nächster Sonntag
+        const errBox = document.getElementById('plan-error'); errBox.style.display = "none";
 
-        let fullTimeline = {}; // Speichert Status pro Tag/Mitarbeiter
-        employees.forEach(e => fullTimeline[e.name] = {});
+        try {
+            let feiertage = getAllFeiertage(year, settings.state).concat(getAllFeiertage(year-1, settings.state));
+            let start = new Date(year, month-1, 1);
+            start.setDate(start.getDate() - (start.getDay() || 7) + 1); // Montag der ersten Woche
+            let end = new Date(year, month, 0);
+            end.setDate(end.getDate() + (7 - (end.getDay() || 7))); // Sonntag der letzten Woche
 
-        // 1. Basis-Status setzen (Archiv, Feiertag, Urlaub, Fest-Frei)
-        let curr = new Date(start);
-        while(curr <= end) {
-            const dStr = curr.toISOString().split('T')[0];
-            const dw = curr.getDay();
-            const wn = getISOWeek(curr);
+            let timeline = {};
+            employees.forEach(e => timeline[e.name] = {});
 
-            employees.forEach(emp => {
-                let status = "Work";
-                let locked = false;
-
-                // Check Archiv (Alle gespeicherten Pläne prüfen)
-                for(let m in savedPlans) {
-                    if(savedPlans[m].fullTimeline && savedPlans[m].fullTimeline[emp.name][dStr]) {
-                        status = savedPlans[m].fullTimeline[emp.name][dStr];
-                        locked = true; break;
+            // 1. BASIS-STATUS (Archiv, Feiertage, Abwesenheiten)
+            let curr = new Date(start);
+            while(curr <= end) {
+                const dStr = curr.toISOString().split('T')[0];
+                const dw = curr.getDay();
+                employees.forEach(emp => {
+                    let status = "Work";
+                    // Lade Archiv von ANDEREN Monaten (für Brückenwochen)
+                    for(let m in savedPlans) {
+                        if(m !== monthVal && savedPlans[m].fullTimeline && savedPlans[m].fullTimeline[emp.name] && savedPlans[m].fullTimeline[emp.name][dStr]) {
+                            status = savedPlans[m].fullTimeline[emp.name][dStr];
+                        }
                     }
-                }
+                    if(status === "Work") {
+                        const isAbs = absences.find(a => a.employeeName === emp.name && dStr >= a.start && dStr <= a.end);
+                        if(dw === 0) status = "Frei (So)";
+                        else if(feiertage.includes(dStr)) status = "Feiertag";
+                        else if(isAbs) status = isAbs.type;
+                        else if(emp.freeday == dw) status = "Frei (Fest)";
+                    }
+                    timeline[emp.name][dStr] = status;
+                });
+                curr.setDate(curr.getDate() + 1);
+            }
 
-                if(!locked) {
-                    const isAbs = absences.find(a => a.employeeName === emp.name && dStr >= a.start && dStr <= a.end);
-                    if(dw === 0) status = "Frei (So)";
-                    else if(feiertage.includes(dStr)) status = "Feiertag";
-                    else if(isAbs) status = isAbs.type;
-                    else if(emp.freeday == dw) status = "Frei (Fest)";
-                }
-                fullTimeline[emp.name][dStr] = status;
-            });
-            curr.setDate(curr.getDate() + 1);
-        }
-
-        // 2. Wochenweise Planung (Eiserne 1-Frei-Regel)
-        let weeks = [...new Set(Object.keys(fullTimeline[employees[0].name]).map(d => getISOWeek(new Date(d))))];
-        
-        weeks.forEach(wn => {
-            employees.forEach(emp => {
-                let daysOfWk = Object.keys(fullTimeline[emp.name]).filter(d => getISOWeek(new Date(d)) === wn && new Date(d).getDay() !== 0);
-                
-                // Hat er in dieser Kalenderwoche schon IRGENDWO frei?
-                let hasFrei = daysOfWk.some(d => ["Frei", "Frei (Fest)", "Wunschfrei", "Urlaub", "Krank"].includes(fullTimeline[emp.name][d]));
-                
-                if(!hasFrei) {
-                    // Er braucht exakt einen freien Tag. Priorität: Samstag (wenn 2/Monat Regel offen)
-                    let mStr = daysOfWk[0].substring(0,7);
-                    let satsInMonth = Object.keys(fullTimeline[emp.name]).filter(d => d.startsWith(mStr) && new Date(d).getDay() === 6);
-                    let satsFree = satsInMonth.filter(d => ["Frei", "Frei (Fest)", "Wunschfrei", "Urlaub", "Krank"].includes(fullTimeline[emp.name][d])).length;
+            // 2. WOCHEN-LOGIK (Eiserne 1-Frei-Regel pro Kalenderwoche)
+            let weeks = [...new Set(Object.keys(timeline[employees[0].name]).map(d => getISOWeek(new Date(d))))];
+            weeks.forEach(wn => {
+                employees.forEach(emp => {
+                    let daysOfWk = Object.keys(timeline[emp.name]).filter(d => getISOWeek(new Date(d)) === wn && new Date(d).getDay() !== 0);
+                    let hasFrei = daysOfWk.some(d => ["Frei", "Frei (Fest)", "Wunschfrei", "Urlaub", "Krank"].includes(timeline[emp.name][d]));
                     
-                    let satOfWk = daysOfWk.find(d => new Date(d).getDay() === 6);
-                    if(emp.satRule && satsFree < 2 && satOfWk && fullTimeline[emp.name][satOfWk] === "Work") {
-                        fullTimeline[emp.name][satOfWk] = "Frei";
-                    } else {
-                        // Sonst Wochentag nach Rotation
-                        let rotationDay = ((wn + employees.indexOf(emp)) % 5) + 1;
-                        let targetDay = daysOfWk.find(d => new Date(d).getDay() === rotationDay && fullTimeline[emp.name][d] === "Work");
-                        
-                        // Wenn rotationDay belegt, suche den Tag mit der besten Besetzung
-                        if(!targetDay) {
+                    if(!hasFrei) {
+                        // Muss ein Tag frei bekommen. Check Samstags-Kontingent im aktuellen Monat.
+                        let satOfWk = daysOfWk.find(d => new Date(d).getDay() === 6);
+                        let mStr = satOfWk ? satOfWk.substring(0,7) : monthVal;
+                        let satsMonth = Object.keys(timeline[emp.name]).filter(d => d.startsWith(mStr) && new Date(d).getDay() === 6);
+                        let satsFreeCount = satsMonth.filter(d => timeline[emp.name][d] !== "Work").length;
+
+                        if(emp.satRule && satsFreeCount < 2 && satOfWk && timeline[emp.name][satOfWk] === "Work") {
+                            timeline[emp.name][satOfWk] = "Frei";
+                        } else {
+                            // Wochentag finden (Rotation + Besetzung)
                             let bestD = null, maxBes = -1;
-                            daysOfWk.filter(d => new Date(d).getDay() <= 5 && fullTimeline[emp.name][d] === "Work").forEach(d => {
-                                let bes = employees.filter(e => fullTimeline[e.name][d] === "Work").length;
-                                if(bes > maxBes) { maxBes = bes; bestD = d; }
+                            daysOfWk.filter(d => new Date(d).getDay() <= 5 && timeline[emp.name][d] === "Work").forEach(d => {
+                                let schonFrei = employees.filter(e => ["Frei", "Wunschfrei"].includes(timeline[e.name][d])).length;
+                                if(schonFrei === 0) { // Priorität: Niemand sonst frei!
+                                    let bes = employees.filter(e => timeline[e.name][d] === "Work").length;
+                                    if(bes > maxBes) { maxBes = bes; bestD = d; }
+                                }
                             });
-                            targetDay = bestD;
+                            // Fallback falls alle Tage schon 1x frei haben: Nimm den Tag mit den meisten Leuten
+                            if(!bestD) {
+                                daysOfWk.filter(d => new Date(d).getDay() <= 5 && timeline[emp.name][d] === "Work").forEach(d => {
+                                    let bes = employees.filter(e => timeline[e.name][d] === "Work").length;
+                                    if(bes > maxBes) { maxBes = bes; bestD = d; }
+                                });
+                            }
+                            if(bestD) timeline[emp.name][bestD] = "Frei";
                         }
-                        if(targetDay) fullTimeline[emp.name][targetDay] = "Frei";
+                    }
+                });
+            });
+
+            // 3. SCHICHTEN (F/S)
+            Object.keys(timeline[employees[0].name]).forEach(dStr => {
+                let working = employees.filter(e => timeline[e.name][dStr] === "Work");
+                if(working.length > 0) {
+                    let d = new Date(dStr);
+                    if(d.getDay() === 6) working.forEach(e => timeline[e.name][dStr] = "F");
+                    else {
+                        let wn = getISOWeek(d);
+                        working.forEach(e => {
+                            let idx = employees.indexOf(e);
+                            timeline[e.name][dStr] = ((idx + wn) % 2 === 0) ? "F" : "S";
+                        });
+                        // Mindestbesetzung & 3-Mann-Regel
+                        let sTeam = working.filter(e => timeline[e.name][dStr] === "S");
+                        let fTeam = working.filter(e => timeline[e.name][dStr] === "F");
+                        if(working.length === 3) {
+                            working.forEach((e, i) => timeline[e.name][dStr] = (i === 0 ? "F" : "S"));
+                        } else {
+                            while(sTeam.length < settings.minSpaet && fTeam.length > 1) {
+                                let mover = fTeam.pop(); timeline[mover.name][dStr] = "S"; sTeam.push(mover);
+                            }
+                        }
                     }
                 }
             });
-        });
 
-        // 3. Schichten (F/S)
-        Object.keys(fullTimeline[employees[0].name]).forEach(dStr => {
-            let working = employees.filter(e => fullTimeline[e.name][dStr] === "Work");
-            if(working.length > 0) {
-                let d = new Date(dStr);
-                if(d.getDay() === 6) working.forEach(e => fullTimeline[e.name][dStr] = "F");
-                else {
-                    let wn = getISOWeek(d);
-                    working.forEach(e => {
-                        let isEven = wn % 2 === 0;
-                        let idx = employees.indexOf(e);
-                        fullTimeline[e.name][dStr] = (idx % 2 === 0) ? (isEven ? "F" : "S") : (isEven ? "S" : "F");
-                    });
-                    
-                    // Korrektur Mindestbesetzung Spät
-                    let sTeam = working.filter(e => fullTimeline[e.name][dStr] === "S");
-                    let fTeam = working.filter(e => fullTimeline[e.name][dStr] === "F");
-                    
-                    // 3-Mann-Notfall Regel
-                    if(working.length === 3) {
-                        working.forEach((e,i) => fullTimeline[e.name][dStr] = (i === 0 ? "F" : "S"));
-                    } else {
-                        while(sTeam.length < settings.minSpaet && fTeam.length > 1) {
-                            let mover = fTeam.pop();
-                            fullTimeline[mover.name][dStr] = "S";
-                            sTeam.push(mover);
-                        }
-                    }
+            // 4. ANZEIGE-DATEN
+            let display = {}; let daysInM = new Date(year, month, 0).getDate();
+            employees.forEach(e => {
+                display[e.name] = [];
+                for(let i=1; i<=daysInM; i++) {
+                    let dStr = `${year}-${String(month).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                    display[e.name].push({ day: i, status: timeline[e.name][dStr] });
                 }
-            }
-        });
+            });
 
-        // 4. Anzeige-Daten filtern
-        let display = {};
-        employees.forEach(e => {
-            display[e.name] = [];
-            for(let d=1; d<=new Date(year, month, 0).getDate(); d++) {
-                let dStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                display[e.name].push({ day: d, status: fullTimeline[e.name][dStr] });
-            }
-        });
+            currentGeneratedPlan = { monthVal, plan: display, fullTimeline: timeline, daysInMonth: daysInM };
+            document.getElementById('plan-result-container').style.display = "block";
+            renderTables(display, daysInM, 'plan-table-wrapper', 'hours-table-wrapper');
 
-        currentGeneratedPlan = { monthVal, plan: display, fullTimeline, daysInMonth: display[employees[0].name].length };
-        renderTables(display, currentGeneratedPlan.daysInMonth, 'plan-table-wrapper', 'hours-table-wrapper');
+        } catch (e) { errBox.innerText = "Fehler: " + e.message; errBox.style.display = "block"; }
     }
 
     function renderTables(pData, dInM, pId, hId) {
-        document.getElementById(pId).parentElement.style.display = "block";
         let html = `<table class="plan-table main-plan-table"><thead><tr><th>Team</th>`;
         for(let d=1; d<=dInM; d++) html += `<th>${d}</th>`;
         html += `</tr></thead><tbody>`;
-        
         employees.forEach(emp => {
-            html += `<tr><td style="text-align:left;"><div class="color-dot" style="display:inline-block;background:${emp.color}"></div> ${emp.name}</td>`;
+            html += `<tr><td style="text-align:left;">${emp.name}</td>`;
             pData[emp.name].forEach(d => {
                 let c = "", s = d.status;
                 if(s === "F") c = "cell-frueh"; else if(s === "S") c = "cell-spaet"; 
@@ -398,15 +395,11 @@
         });
         document.getElementById(pId).innerHTML = html + "</tbody></table>";
 
-        // Stunden (Vereinfacht)
-        let hHtml = `<table class="plan-table hours-table"><thead><tr><th>Name</th><th>Soll</th><th>Ist</th><th>Diff</th></tr></thead><tbody>`;
+        let hHtml = `<table class="plan-table hours-table"><thead><tr><th>Name</th><th>Soll</th><th>Ist</th></tr></thead><tbody>`;
         employees.forEach(emp => {
             let ist = pData[emp.name].filter(d => ["F","S"].includes(d.status)).length * 8;
             let ft = pData[emp.name].filter(d => d.status === "Feiertag").length * 8;
-            let u = pData[emp.name].filter(d => d.status === "Urlaub" || d.status === "Krank").length * 8;
-            let total = ist + ft + u;
-            let soll = pData[emp.name].filter(d => d.status !== "Frei (So)").length * 8; // Grobe Schätzung
-            hHtml += `<tr><td>${emp.name}</td><td>${soll}</td><td>${total}</td><td>${total-soll}</td></tr>`;
+            hHtml += `<tr><td>${emp.name}</td><td>160</td><td>${ist + ft}</td></tr>`;
         });
         document.getElementById(hId).innerHTML = hHtml + "</tbody></table>";
     }
@@ -415,24 +408,25 @@
         if(!currentGeneratedPlan) return;
         savedPlans[currentGeneratedPlan.monthVal] = currentGeneratedPlan;
         localStorage.setItem('saved_plans', JSON.stringify(savedPlans));
-        alert("Plan gespeichert!"); renderArchiv();
+        alert("Plan archiviert!"); renderArchiv();
     }
 
     function renderArchiv() {
         const l = document.getElementById('saved-plans-list'); l.innerHTML = '';
         Object.keys(savedPlans).sort().forEach(m => {
-            l.innerHTML += `<div class="employee-item"><strong>${m}</strong><div><button onclick="viewPlan('${m}')" style="color:var(--primary);margin-right:10px;">Ansehen</button><button class="delete-btn" onclick="deletePlan('${m}')">Löschen</button></div></div>`;
+            l.innerHTML += `<div class="employee-item"><strong>Plan: ${m}</strong><div><button onclick="viewPlan('${m}')" style="color:var(--primary);margin-right:10px;">Öffnen</button><button class="delete-btn" onclick="deletePlan('${m}')">Löschen</button></div></div>`;
         });
     }
 
     function viewPlan(m) {
         const d = savedPlans[m]; document.getElementById('saved-plan-view').style.display='block';
         renderTables(d.plan, d.daysInMonth, 'saved-plan-table-wrapper', 'saved-hours-table-wrapper');
+        window.scrollTo(0, document.getElementById('saved-plan-view').offsetTop);
     }
 
-    function deletePlan(m) { delete savedPlans[m]; localStorage.setItem('saved_plans', JSON.stringify(savedPlans)); renderArchiv(); }
+    function deletePlan(m) { if(confirm("Löschen?")) { delete savedPlans[m]; localStorage.setItem('saved_plans', JSON.stringify(savedPlans)); renderArchiv(); } }
 
-    renderEmployees(); renderAbsences(); renderArchiv();
+    renderEmployees(); renderAbsences(); renderArchiv(); loadSettingsToForm();
   </script>
 </body>
 </html>
