@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dienstplan Generator</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#007bff">
+</head>
+<body>
+
+  <header>
+    <h1 id="app-title">Team</h1>
+  </header>
+
+  <main>
+    <section id="team" class="tab-content active">
+      <div class="card">
+        <h3>Neuer Mitarbeiter</h3>
+        <p>Hier kommt das Formular für Name, Farbe, Festtage etc. hin.</p>
+        <button class="primary-btn" onclick="alert('Mitarbeiter-Logik folgt!')">+ Mitarbeiter anlegen</button>
+      </div>
+      <div id="employee-list"></div>
+    </section>
+
+    <section id="urlaub" class="tab-content">
+      <div class="card">
+        <h3>Abwesenheit eintragen</h3>
+        <p>Kalender-Auswahl für Urlaub, Krank oder Wunschfrei.</p>
+      </div>
+    </section>
+
+    <section id="generieren" class="tab-content">
+      <div class="card">
+        <h3>Dienstplan erstellen</h3>
+        <p>Prüft Konflikte und wendet die Schichtwechsel-Logik an.</p>
+        <button class="primary-btn">Plan generieren</button>
+      </div>
+    </section>
+
+    <section id="plaene" class="tab-content">
+      <div class="card">
+        <h3>Gespeicherte Pläne</h3>
+        <p>Hier werden die PDFs und CSVs zum Download angeboten.</p>
+      </div>
+    </section>
+
+    <section id="einstellungen" class="tab-content">
+      <div class="card">
+        <h3>Schichtzeiten & Stunden</h3>
+        <p>Konfiguration der Mindestbesetzung, Stunden-Logik und Bundesland.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="nav-btn active" data-target="team">Team</button>
+    <button class="nav-btn" data-target="urlaub">Urlaub</button>
+    <button class="nav-btn" data-target="generieren">Generieren</button>
+    <button class="nav-btn" data-target="plaene">Pläne</button>
+    <button class="nav-btn" data-target="einstellungen">Setup</button>
+  </nav>
+
+  <script>
+    // 1. Service Worker Registrierung (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registriert', reg))
+          .catch(err => console.error('SW Error', err));
+      });
+    }
+
+    // 2. Tab Navigation Logik
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const appTitle = document.getElementById('app-title');
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Active states entfernen
+        navButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+
+        // Neuen Tab aktivieren
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+        
+        // Titel im Header anpassen
+        appTitle.innerText = btn.innerText;
+      });
+    });
+
+    // Hier wird später der komplexe Algorithmus und die IndexedDB (Datenbank) eingebaut.
+    // Datenstruktur für die Zukunft:
+    let employees = []; // Speichert Objekte {id, name, color, fixedDayOff, participatesInSatRule...}
+    let absences = []; // Speichert Objekte {empId, type, startDate, endDate}
+    let settings = { state: 'BE', earlyStart: '06:00', lateStart: '14:00' };
+  </script>
+</body>
+</html>
