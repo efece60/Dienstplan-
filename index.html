@@ -43,12 +43,43 @@
 
       <div class="card">
         <h3>Team Liste</h3>
-        <div id="employee-list">
-          </div>
+        <div id="employee-list"></div>
       </div>
     </section>
 
-    <section id="urlaub" class="tab-content"><div class="card">Urlaubs-Funktion folgt...</div></section>
+    <section id="urlaub" class="tab-content">
+      <div class="card">
+        <h3>Abwesenheit eintragen</h3>
+        <div class="form-group">
+          <label>Mitarbeiter</label>
+          <select id="abs-employee">
+            </select>
+        </div>
+        <div class="form-group">
+          <label>Art der Abwesenheit</label>
+          <select id="abs-type">
+            <option value="Urlaub">Urlaub</option>
+            <option value="Wunschfrei">Wunschfrei</option>
+            <option value="Krank">Krankmeldung</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Von (Datum)</label>
+          <input type="date" id="abs-start">
+        </div>
+        <div class="form-group">
+          <label>Bis (Datum)</label>
+          <input type="date" id="abs-end">
+        </div>
+        <button class="primary-btn" onclick="addAbsence()" style="margin-top:1rem">Eintragen</button>
+      </div>
+
+      <div class="card">
+        <h3>Geplante Abwesenheiten</h3>
+        <div id="absence-list"></div>
+      </div>
+    </section>
+
     <section id="generieren" class="tab-content"><div class="card">Planungs-Logik folgt...</div></section>
     <section id="plaene" class="tab-content"><div class="card">Archiv folgt...</div></section>
     <section id="einstellungen" class="tab-content"><div class="card">Optionen folgen...</div></section>
@@ -76,9 +107,11 @@
       });
     });
 
-    // --- MITARBEITER LOGIK ---
+    // --- DATEN LADEN ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
+    let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
 
+    // --- TEAM LOGIK ---
     function renderEmployees() {
       const list = document.getElementById('employee-list');
       list.innerHTML = '';
@@ -94,6 +127,7 @@
         `;
         list.appendChild(div);
       });
+      updateEmployeeDropdown(); // Dropdown im Urlaubs-Tab aktualisieren
     }
 
     function addEmployee() {
@@ -105,26 +139,89 @@
       if(!name) return alert("Bitte Namen eingeben");
 
       employees.push({ name, color, freeday, satRule });
-      saveAndRender();
-      
-      // Formular leeren
+      localStorage.setItem('team_data', JSON.stringify(employees));
+      renderEmployees();
       document.getElementById('emp-name').value = '';
     }
 
     function deleteEmployee(index) {
       if(confirm("Mitarbeiter wirklich löschen?")) {
         employees.splice(index, 1);
-        saveAndRender();
+        localStorage.setItem('team_data', JSON.stringify(employees));
+        renderEmployees();
       }
     }
 
-    function saveAndRender() {
-      localStorage.setItem('team_data', JSON.stringify(employees));
-      renderEmployees();
+    // --- URLAUB LOGIK ---
+    function updateEmployeeDropdown() {
+      const select = document.getElementById('abs-employee');
+      select.innerHTML = '';
+      employees.forEach((emp, index) => {
+        const option = document.createElement('option');
+        option.value = emp.name;
+        option.text = emp.name;
+        select.appendChild(option);
+      });
+    }
+
+    function renderAbsences() {
+      const list = document.getElementById('absence-list');
+      list.innerHTML = '';
+      
+      // Sortieren nach Startdatum
+      absences.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+      absences.forEach((abs, index) => {
+        const div = document.createElement('div');
+        div.className = 'employee-item'; // Nutze den gleichen Style wie beim Team
+        
+        // Datum schön formatieren
+        const startDate = new Date(abs.start).toLocaleDateString('de-DE');
+        const endDate = new Date(abs.end).toLocaleDateString('de-DE');
+        const dateString = abs.start === abs.end ? startDate : `${startDate} - ${endDate}`;
+
+        div.innerHTML = `
+          <div class="employee-info" style="flex-direction: column; align-items: flex-start;">
+            <strong>${abs.employeeName} (${abs.type})</strong>
+            <span style="font-size: 0.85rem; color: #666;">${dateString}</span>
+          </div>
+          <button class="delete-btn" onclick="deleteAbsence(${index})">Löschen</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addAbsence() {
+      const employeeName = document.getElementById('abs-employee').value;
+      const type = document.getElementById('abs-type').value;
+      const start = document.getElementById('abs-start').value;
+      const end = document.getElementById('abs-end').value || start; // Wenn kein Ende, dann ist es nur 1 Tag
+
+      if(!employeeName) return alert("Bitte erst Mitarbeiter im Team-Tab anlegen!");
+      if(!start) return alert("Bitte Startdatum auswählen!");
+      if(new Date(end) < new Date(start)) return alert("Das Enddatum darf nicht vor dem Startdatum liegen!");
+
+      absences.push({ employeeName, type, start, end });
+      localStorage.setItem('absence_data', JSON.stringify(absences));
+      renderAbsences();
+      
+      // Felder leeren
+      document.getElementById('abs-start').value = '';
+      document.getElementById('abs-end').value = '';
+      alert('Erfolgreich eingetragen!');
+    }
+
+    function deleteAbsence(index) {
+      if(confirm("Diesen Eintrag wirklich löschen?")) {
+        absences.splice(index, 1);
+        localStorage.setItem('absence_data', JSON.stringify(absences));
+        renderAbsences();
+      }
     }
 
     // Initial beim Start laden
     renderEmployees();
+    renderAbsences();
 
     // Service Worker Register
     if ('serviceWorker' in navigator) {
