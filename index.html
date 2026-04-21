@@ -6,7 +6,7 @@
   <title>Dienstplan Generator</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    /* DAS SCHÖNE DESIGN IST WIEDER DA */
+    /* DESIGN BLEIBT UNANGETASTET! */
     :root {
       --primary: #007bff;
       --bg-light: #f4f7f6;
@@ -121,6 +121,27 @@
             <h3>Stundenübersicht (Soll / Ist)</h3>
             <div class="table-container" id="hours-table-wrapper"></div>
         </div>
+        <button class="primary-btn" onclick="saveCurrentPlan()" style="margin-top: 1rem; background-color: #28a745;">Diesen Plan im Archiv speichern</button>
+      </div>
+    </section>
+
+    <section id="plaene" class="tab-content">
+      <div class="card">
+        <h3>Gespeicherte Pläne</h3>
+        <div id="saved-plans-list">
+          </div>
+      </div>
+
+      <div id="saved-plan-view" style="display:none;">
+        <div class="card">
+            <h3 id="saved-plan-title">Plan</h3>
+            <div class="table-container" id="saved-plan-table-wrapper"></div>
+        </div>
+        <div class="card">
+            <h3>Stundenübersicht</h3>
+            <div class="table-container" id="saved-hours-table-wrapper"></div>
+        </div>
+        <button class="primary-btn" onclick="document.getElementById('saved-plan-view').style.display='none'; window.scrollTo(0,0);" style="margin-top:1rem; background-color: #666;">Ansicht schließen</button>
       </div>
     </section>
 
@@ -142,9 +163,9 @@
 
       <div class="card">
         <h3>Schichtzeiten & Besetzung</h3>
-        <div class="form-group"><label>Frühschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div></div>
-        <div class="form-group"><label>Spätschicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div></div>
-        <div class="form-group"><label>Samstags-Schicht</label><div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div></div>
+        <div class="form-group"><label>Frühschicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-frueh-start" value="06:00"><input type="time" id="set-frueh-end" value="14:00"></div></div>
+        <div class="form-group"><label>Spätschicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-spaet-start" value="14:00"><input type="time" id="set-spaet-end" value="22:00"></div></div>
+        <div class="form-group"><label>Samstags-Schicht (Start - Ende)</label><div style="display:flex; gap:10px;"><input type="time" id="set-sa-start" value="06:00"><input type="time" id="set-sa-end" value="14:00"></div></div>
         <div class="form-group"><label>Mindestbesetzung Spätschicht</label><input type="number" id="set-min-spaet" value="2"></div>
       </div>
 
@@ -167,8 +188,6 @@
         <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Einstellungen speichern</button>
       </div>
     </section>
-    
-    <section id="plaene" class="tab-content"><div class="card">Export kommt im nächsten Schritt!</div></section>
   </main>
 
   <nav>
@@ -196,6 +215,10 @@
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
     let editIndex = -1;
     let settings = JSON.parse(localStorage.getItem('app_settings')) || {};
+    
+    // Globale Variablen für das Speichern von Plänen
+    let currentGeneratedPlan = null;
+    let savedPlans = JSON.parse(localStorage.getItem('saved_plans')) || {};
 
     if(!settings.state) settings.state = 'NW';
     if(!settings.fruehStart) settings.fruehStart = '06:00'; if(!settings.fruehEnd) settings.fruehEnd = '14:00';
@@ -361,7 +384,7 @@
             }
         });
 
-        // --- STRIKTE 5-TAGE-WOCHE (Auch Urlaub zählt als aktiver Tag) ---
+        // --- STRIKTE 5-TAGE-WOCHE ---
         let uniqueWeeks = [...new Set(plan[employees[0].name].map(d => d.weekNumber))];
         uniqueWeeks.forEach(week => {
             employees.forEach(emp => {
@@ -410,7 +433,7 @@
             }
         });
 
-        // --- STUNDENBERECHNUNG (HART KORRIGIERT NACH DEINER VORGABE) ---
+        // --- STUNDENBERECHNUNG ---
         let displayPlan = {};
         employees.forEach(emp => {
             displayPlan[emp.name] = plan[emp.name].filter(d => d.isCurrentMonth);
@@ -431,8 +454,8 @@
                         hours[emp.name].ist += h.mofr_work_ist; 
                     }
                     else if(s==='Urlaub'||s==='Krank') { 
-                        hours[emp.name].soll += 8; 
-                        hours[emp.name].ist += 8; 
+                        hours[emp.name].soll += h.mofr_work_soll; 
+                        hours[emp.name].ist += h.mofr_work_soll; // Lohnfortzahlung gleicht Soll aus!
                     }
                     else { // Frei, Frei (Fest), Wunschfrei
                         hours[emp.name].soll += h.mofr_frei_soll; 
@@ -445,8 +468,8 @@
                         hours[emp.name].ist += h.sa_work_ist; 
                     }
                     else if(s==='Urlaub'||s==='Krank') { 
-                        hours[emp.name].soll += 0; 
-                        hours[emp.name].ist += 0; 
+                        hours[emp.name].soll += h.sa_work_soll; 
+                        hours[emp.name].ist += h.sa_work_soll; 
                     }
                     else { // Frei, Wunschfrei
                         hours[emp.name].soll += h.sa_frei_soll; 
@@ -457,16 +480,27 @@
         });
 
         if(warnings.length > 0) { errDiv.innerHTML = "<strong>Besetzung prüfen:</strong><br>" + [...new Set(warnings)].join("<br>"); errDiv.style.display = "block"; }
-        renderTables(displayPlan, hours, lastDayOfMonth.getDate());
+        
+        // Speichere den aktuellen Plan temporär zwischen (für den Archiv-Button)
+        currentGeneratedPlan = {
+            monthVal: monthVal,
+            plan: displayPlan,
+            hours: hours,
+            daysInMonth: lastDayOfMonth.getDate()
+        };
+        
+        renderTables(displayPlan, hours, lastDayOfMonth.getDate(), 'plan-table-wrapper', 'hours-table-wrapper');
     }
 
-    function renderTables(planData, hoursData, daysInMonth) {
-        document.getElementById('plan-result-container').style.display = "block";
+    function renderTables(planData, hoursData, daysInMonth, planContainerId, hoursContainerId) {
+        document.getElementById(planContainerId).parentElement.parentElement.style.display = "block"; // Zeige Result Container
+        
         let html = '<table class="plan-table"><thead><tr><th>Mitarbeiter</th>';
         for(let d=1; d<=daysInMonth; d++) html += `<th>${d}.</th>`;
         html += '</tr></thead><tbody>';
 
         employees.forEach(emp => {
+            if(!planData[emp.name]) return; // Fallback falls MA im Archiv-Plan nicht mehr existiert
             html += `<tr><td style="text-align:left; font-weight:bold; min-width: 120px;"><div style="display:inline-block; width:10px; height:10px; background:${emp.color}; border-radius:50%; margin-right:5px;"></div>${emp.name}</td>`;
             planData[emp.name].forEach(day => {
                 let cssClass = "", text = day.status;
@@ -478,17 +512,73 @@
             });
             html += '</tr>';
         });
-        html += '</tbody></table>'; document.getElementById('plan-table-wrapper').innerHTML = html;
+        html += '</tbody></table>'; document.getElementById(planContainerId).innerHTML = html;
 
         let hHtml = '<table class="plan-table" style="width:auto; min-width:300px; margin-top:0;"><thead><tr><th>Mitarbeiter</th><th>Soll (h)</th><th>Ist (h)</th><th>Diff</th></tr></thead><tbody>';
         employees.forEach(emp => {
+            if(!hoursData[emp.name]) return;
             const h = hoursData[emp.name]; const diff = h.ist - h.soll; const c = diff < 0 ? 'color:red;' : (diff > 0 ? 'color:green;' : '');
             hHtml += `<tr><td style="text-align:left;">${emp.name}</td><td>${h.soll.toFixed(1)}</td><td>${h.ist.toFixed(1)}</td><td style="font-weight:bold; ${c}">${diff > 0 ? '+'+diff.toFixed(1) : diff.toFixed(1)}</td></tr>`;
         });
-        hHtml += '</tbody></table>'; document.getElementById('hours-table-wrapper').innerHTML = hHtml;
+        hHtml += '</tbody></table>'; document.getElementById(hoursContainerId).innerHTML = hHtml;
     }
 
-    renderEmployees(); renderAbsences(); loadSettingsToForm();
+    // --- PLÄNE SPEICHERN & ARCHIV ---
+    function saveCurrentPlan() {
+        if(!currentGeneratedPlan) return alert("Bitte generiere erst einen Plan!");
+        savedPlans[currentGeneratedPlan.monthVal] = currentGeneratedPlan;
+        localStorage.setItem('saved_plans', JSON.stringify(savedPlans));
+        alert(`Plan für ${currentGeneratedPlan.monthVal} wurde im Archiv gespeichert!`);
+        renderSavedPlansList();
+    }
+
+    function renderSavedPlansList() {
+        const list = document.getElementById('saved-plans-list');
+        list.innerHTML = '';
+        const months = Object.keys(savedPlans).sort(); // Alphabetisch sortieren
+        
+        if(months.length === 0) {
+            list.innerHTML = '<p style="color: #666; font-size: 0.9rem;">Noch keine Pläne gespeichert.</p>';
+            return;
+        }
+
+        months.forEach(m => {
+            const [y, mo] = m.split('-');
+            list.innerHTML += `
+            <div class="employee-item">
+                <div class="employee-info"><strong>Dienstplan: ${mo} / ${y}</strong></div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="viewSavedPlan('${m}')" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">Ansehen</button>
+                    <button onclick="deleteSavedPlan('${m}')" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">Löschen</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function viewSavedPlan(monthVal) {
+        const data = savedPlans[monthVal];
+        if(!data) return;
+        document.getElementById('saved-plan-view').style.display = 'block';
+        document.getElementById('saved-plan-title').innerText = `Gefrorener Plan: ${monthVal}`;
+        renderTables(data.plan, data.hours, data.daysInMonth, 'saved-plan-table-wrapper', 'saved-hours-table-wrapper');
+        document.getElementById('saved-plan-view').scrollIntoView({behavior: 'smooth'});
+    }
+
+    function deleteSavedPlan(monthVal) {
+        if(confirm(`Möchtest du den Plan für ${monthVal} wirklich aus dem Archiv löschen?`)) {
+            delete savedPlans[monthVal];
+            localStorage.setItem('saved_plans', JSON.stringify(savedPlans));
+            document.getElementById('saved-plan-view').style.display = 'none';
+            renderSavedPlansList();
+        }
+    }
+
+    // Init
+    renderEmployees(); 
+    renderAbsences(); 
+    loadSettingsToForm();
+    renderSavedPlansList(); // Lade Archiv-Liste beim Start
+
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
   </script>
 </body>
