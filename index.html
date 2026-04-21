@@ -6,7 +6,6 @@
   <title>Dienstplan Generator Pro</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    /* DESIGN & LAYOUT */
     :root {
       --primary: #007bff;
       --bg-light: #f4f7f6;
@@ -26,7 +25,7 @@
     
     .form-group { margin-bottom: 1rem; }
     label { display: block; font-size: 0.9rem; margin-bottom: 0.4rem; font-weight: bold; }
-    input[type="text"], input[type="color"], input[type="date"], input[type="month"], input[type="time"], input[type="number"], select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    input, select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
     
     .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 0.5rem; }
     button.primary-btn { background: var(--primary); color: white; border: none; padding: 1rem; border-radius: 8px; width: 100%; font-size: 1rem; font-weight: bold; cursor: pointer; }
@@ -57,20 +56,12 @@
 
     @media print {
         @page { size: landscape; margin: 10mm; }
-        body { background: white; padding: 0; margin: 0; color: black; }
-        header, nav, button, input, select, label, .form-group, .checkbox-group, #plan-error, h3 { display: none !important; }
-        .card { box-shadow: none; border: none; padding: 0; margin: 0; background: transparent; }
-        .tab-content { padding: 0; }
-        .table-container { overflow: visible !important; border: none; }
-        .plan-table { width: 100%; font-size: 10pt; min-width: auto; }
-        .plan-table th, .plan-table td { border: 1px solid #000; padding: 4px; }
-        .cell-frueh { background-color: #d4edda !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .cell-spaet { background-color: #cce5ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .cell-frei { background-color: #e2e3e5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .cell-urlaub { background-color: #fff3cd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .cell-krank { background-color: #f8d7da !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .cell-feiertag { background-color: #ffdfba !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .print-title { display: block !important; font-size: 14pt; font-weight: bold; margin-bottom: 10px; margin-top: 20px; }
+        body { background: white; padding: 0; margin: 0; }
+        header, nav, button, .form-group, #plan-error, h3 { display: none !important; }
+        .card { box-shadow: none; border: none; padding: 0; }
+        .table-container { overflow: visible !important; }
+        .plan-table { width: 100%; font-size: 10pt; }
+        .print-title { display: block !important; font-size: 14pt; font-weight: bold; margin-bottom: 10px; }
     }
     .print-title { display: none; }
   </style>
@@ -84,7 +75,7 @@
       <div class="card">
         <h3 id="form-title">Mitarbeiter hinzufügen</h3>
         <div class="form-group"><label>Name</label><input type="text" id="emp-name" placeholder="Name"></div>
-        <div class="form-group"><label>Anzeige-Farbe</label><input type="color" id="emp-color" value="#007bff"></div>
+        <div class="form-group"><label>Farbe</label><input type="color" id="emp-color" value="#007bff"></div>
         <div class="form-group"><label>Fester freier Tag</label>
           <select id="emp-freeday">
             <option value="none">Keiner</option><option value="1">Montag</option><option value="2">Dienstag</option>
@@ -94,7 +85,7 @@
         <div class="form-group"><label>Schicht-Pairing</label><select id="emp-pairing"><option value="none">Niemandem</option></select></div>
         <div class="checkbox-group"><input type="checkbox" id="emp-sat-rule" checked><label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label></div>
         <div id="form-buttons" style="margin-top: 1rem; display: flex; gap: 10px;">
-            <button class="primary-btn" id="btn-save" onclick="handleEmployeeSave()">Speichern</button>
+            <button class="primary-btn" onclick="handleEmployeeSave()">Speichern</button>
             <button class="primary-btn" id="btn-cancel" onclick="cancelEdit()" style="display:none; background: #666;">Abbrechen</button>
         </div>
       </div>
@@ -103,20 +94,20 @@
 
     <section id="urlaub" class="tab-content">
       <div class="card">
-        <h3>Abwesenheit</h3>
+        <h3>Abwesenheit eintragen</h3>
         <div class="form-group"><label>Mitarbeiter</label><select id="abs-employee"></select></div>
         <div class="form-group"><label>Art</label><select id="abs-type"><option value="Urlaub">Urlaub</option><option value="Wunschfrei">Wunschfrei</option><option value="Krank">Krankmeldung</option></select></div>
         <div class="form-group"><label>Von</label><input type="date" id="abs-start"></div>
         <div class="form-group"><label>Bis</label><input type="date" id="abs-end"></div>
         <button class="primary-btn" onclick="addAbsence()" style="margin-top:1rem">Eintragen</button>
       </div>
-      <div class="card"><h3>Liste</h3><div id="absence-list"></div></div>
+      <div class="card"><h3>Geplante Abwesenheiten</h3><div id="absence-list"></div></div>
     </section>
 
     <section id="generieren" class="tab-content active">
       <div class="card">
         <h3>Dienstplan erstellen</h3>
-        <div class="form-group"><label>Monat</label><input type="month" id="plan-month"></div>
+        <div class="form-group"><label>Monat auswählen</label><input type="month" id="plan-month"></div>
         <button class="primary-btn" onclick="startGeneration()">Plan berechnen</button>
         <div id="plan-error" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-top: 10px; font-weight: bold; display:none;"></div>
       </div>
@@ -124,7 +115,7 @@
       <div id="plan-result-container" style="display:none;">
         <div class="print-title" id="print-title-new">Dienstplan</div>
         <div class="card"><div class="table-container" id="plan-table-wrapper"></div></div>
-        <div class="card"><h3>Stundenübersicht</h3><div class="table-container" id="hours-table-wrapper"></div></div>
+        <div class="card"><h3>Stundenübersicht (Soll / Ist)</h3><div class="table-container" id="hours-table-wrapper"></div></div>
         <div style="display: flex; gap: 10px; margin-top: 1rem;">
             <button class="primary-btn" onclick="saveCurrentPlan()" style="background-color: #28a745;">Plan speichern</button>
             <button class="primary-btn" onclick="window.print()" style="background-color: #17a2b8;">PDF / Drucken</button>
@@ -138,16 +129,13 @@
         <div class="print-title" id="print-title-archive">Archiv</div>
         <div class="card"><h3 id="saved-plan-title">Plan</h3><div class="table-container" id="saved-plan-table-wrapper"></div></div>
         <div class="card"><h3>Stundenübersicht</h3><div class="table-container" id="saved-hours-table-wrapper"></div></div>
-        <div style="display: flex; gap: 10px; margin-top: 1rem;">
-            <button class="primary-btn" onclick="document.getElementById('saved-plan-view').style.display='none'; window.scrollTo(0,0);" style="background-color: #666;">Schließen</button>
-            <button class="primary-btn" onclick="window.print()" style="background-color: #17a2b8;">PDF / Drucken</button>
-        </div>
+        <button class="primary-btn" onclick="document.getElementById('saved-plan-view').style.display='none';" style="background: #666; margin-top:1rem;">Schließen</button>
       </div>
     </section>
 
     <section id="einstellungen" class="tab-content">
       <div class="card">
-        <h3>Setup</h3>
+        <h3>Region & Feiertage</h3>
         <div class="form-group">
           <label>Bundesland</label>
           <select id="set-state">
@@ -160,7 +148,23 @@
           </select>
         </div>
         <div class="form-group"><label>Min. Spätbesetzung</label><input type="number" id="set-min-spaet" value="2"></div>
-        <button class="primary-btn" onclick="saveSettings()">Speichern</button>
+      </div>
+
+      <div class="card">
+        <h3>Stundenberechnung (Soll / Ist)</h3>
+        <h4 style="font-size:0.9rem; border-bottom:1px solid #eee; margin-bottom:10px;">Reguläre Tage (Mo-Fr)</h4>
+        <div class="form-group"><label>Mo-Fr Arbeit</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Mo-Fr Frei / Wunschfrei</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-frei-ist" placeholder="Ist"></div></div>
+        
+        <h4 style="font-size:0.9rem; border-bottom:1px solid #eee; margin-bottom:10px; margin-top:15px;">Samstage</h4>
+        <div class="form-group"><label>Samstag Arbeit</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Samstag Frei</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-frei-ist" placeholder="Ist"></div></div>
+        
+        <h4 style="font-size:0.9rem; border-bottom:1px solid #eee; margin-bottom:10px; margin-top:15px;">Feiertage</h4>
+        <div class="form-group"><label>Feiertag Arbeit</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-ft-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-ft-work-ist" placeholder="Ist"></div></div>
+        <div class="form-group"><label>Feiertag Frei (unter der Woche)</label><div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-ft-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-ft-frei-ist" placeholder="Ist"></div></div>
+        
+        <button class="primary-btn" onclick="saveSettings()">Einstellungen speichern</button>
       </div>
     </section>
   </main>
@@ -176,38 +180,53 @@
   <script>
     // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        navButtons.forEach(b => b.classList.remove('active')); tabContents.forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); document.getElementById(btn.getAttribute('data-target')).classList.add('active');
         document.getElementById('app-title').innerText = btn.innerText;
       });
     });
 
-    // --- DATEN INIT ---
+    // --- DATEN & SETUP ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
-    let settings = JSON.parse(localStorage.getItem('app_settings')) || { state: 'NW', minSpaet: 2 };
+    let settings = JSON.parse(localStorage.getItem('app_settings')) || {
+        state: 'NW', minSpaet: 2,
+        h: { mofr_work_soll: 8, mofr_work_ist: 8, mofr_frei_soll: 8, mofr_frei_ist: 0, sa_work_soll: 0, sa_work_ist: 8, sa_frei_soll: 0, sa_frei_ist: 0, ft_work_soll: 0, ft_work_ist: 8, ft_frei_soll: 0, ft_frei_ist: 0 }
+    };
     let savedPlans = JSON.parse(localStorage.getItem('saved_plans')) || {};
     let currentGeneratedPlan = null;
     let editIndex = -1;
 
+    function loadSettingsToForm() {
+        document.getElementById('set-state').value = settings.state;
+        document.getElementById('set-min-spaet').value = settings.minSpaet;
+        for(let key in settings.h) {
+            let el = document.getElementById('h-' + key.replace('_','-'));
+            if(el) el.value = settings.h[key];
+        }
+    }
+
     function saveSettings() {
         settings.state = document.getElementById('set-state').value;
         settings.minSpaet = parseInt(document.getElementById('set-min-spaet').value) || 2;
-        localStorage.setItem('app_settings', JSON.stringify(settings)); alert("Gespeichert");
+        for(let key in settings.h) {
+            let el = document.getElementById('h-' + key.replace('_','-'));
+            if(el) settings.h[key] = parseFloat(el.value) || 0;
+        }
+        localStorage.setItem('app_settings', JSON.stringify(settings)); alert("Gespeichert!");
     }
 
     function renderEmployees() {
-      const list = document.getElementById('employee-list'); if(!list) return; list.innerHTML = '';
+      const list = document.getElementById('employee-list'); list.innerHTML = '';
       employees.forEach((emp, i) => {
         list.innerHTML += `<div class="employee-item"><div class="employee-info"><div class="color-dot" style="background:${emp.color}"></div><strong>${emp.name}</strong></div><div><button onclick="editEmployee(${i})" style="color:var(--primary);margin-right:10px;background:none;border:none;">Edit</button><button class="delete-btn" onclick="deleteEmployee(${i})">Löschen</button></div></div>`;
       });
       document.getElementById('emp-pairing').innerHTML = '<option value="none">Niemandem</option>' + employees.map(e=>`<option value="${e.name}">${e.name}</option>`).join('');
       document.getElementById('abs-employee').innerHTML = employees.map(e=>`<option value="${e.name}">${e.name}</option>`).join('');
     }
-
     function handleEmployeeSave() {
       const name = document.getElementById('emp-name').value; if(!name) return;
       const data = { name, color: document.getElementById('emp-color').value, freeday: document.getElementById('emp-freeday').value, pairedWith: document.getElementById('emp-pairing').value, satRule: document.getElementById('emp-sat-rule').checked };
@@ -231,7 +250,7 @@
     }
     function deleteAbsence(i) { absences.splice(i,1); localStorage.setItem('absence_data', JSON.stringify(absences)); renderAbsences(); }
 
-    // --- LOGIK ---
+    // --- LOGIK (FEIERTAGE & WOCHEN) ---
     function getISOWeek(date) {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
@@ -239,7 +258,7 @@
     }
     function getEasterDate(y) {
         const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;
-        return new Date(y, Math.floor(n / 31) - 1, (n % 31) + 1);
+        return new Date(y, Math.floor(n/31)-1, (n%31)+1);
     }
     function getAllFeiertage(y, s) {
         const f = []; const add = (d,m) => f.push(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
@@ -248,13 +267,17 @@
         const addRel = (o) => { const r = new Date(e); r.setDate(e.getDate()+o); f.push(`${r.getFullYear()}-${String(r.getMonth()+1).padStart(2,'0')}-${String(r.getDate()).padStart(2,'0')}`); };
         addRel(-2); addRel(1); addRel(39); addRel(50);
         if(['BW','BY','NW','RP','SL','HE'].includes(s)) addRel(60);
-        if(['BW','BY','NW','RP','SL'].includes(s)) add(1,11);
+        if(['BW','BY','NW','RP','SL','BB','MV','SN','ST','TH'].includes(s)) {
+            if(['BB','MV','SN','ST','TH'].includes(s)) add(31,10);
+            if(['BW','BY','NW','RP','SL'].includes(s)) add(1,11);
+        }
         return f;
     }
 
+    // --- HAUPT-ALGORITHMUS ---
     function startGeneration() {
         const monthVal = document.getElementById('plan-month').value;
-        if(!monthVal || employees.length === 0) return alert("Wähle Monat und lege Team an!");
+        if(!monthVal || employees.length === 0) return alert("Wähle einen Monat und lege Teammitglieder an!");
         const [year, month] = monthVal.split('-').map(Number);
         const errBox = document.getElementById('plan-error'); errBox.style.display = "none";
 
@@ -268,14 +291,14 @@
             let timeline = {};
             employees.forEach(e => timeline[e.name] = {});
 
-            // 1. BASIS-STATUS (Archiv, Feiertage, Abwesenheiten)
+            // 1. Basis-Status (Sunday, Archiv, Feiertage, Urlaub)
             let curr = new Date(start);
             while(curr <= end) {
                 const dStr = curr.toISOString().split('T')[0];
                 const dw = curr.getDay();
                 employees.forEach(emp => {
                     let status = "Work";
-                    // Lade Archiv von ANDEREN Monaten (für Brückenwochen)
+                    // Archiv laden (Priorität)
                     for(let m in savedPlans) {
                         if(m !== monthVal && savedPlans[m].fullTimeline && savedPlans[m].fullTimeline[emp.name] && savedPlans[m].fullTimeline[emp.name][dStr]) {
                             status = savedPlans[m].fullTimeline[emp.name][dStr];
@@ -293,7 +316,7 @@
                 curr.setDate(curr.getDate() + 1);
             }
 
-            // 2. WOCHEN-LOGIK (Eiserne 1-Frei-Regel pro Kalenderwoche)
+            // 2. Wochen-Logik (Eiserne 1-Frei-Regel)
             let weeks = [...new Set(Object.keys(timeline[employees[0].name]).map(d => getISOWeek(new Date(d))))];
             weeks.forEach(wn => {
                 employees.forEach(emp => {
@@ -301,7 +324,7 @@
                     let hasFrei = daysOfWk.some(d => ["Frei", "Frei (Fest)", "Wunschfrei", "Urlaub", "Krank"].includes(timeline[emp.name][d]));
                     
                     if(!hasFrei) {
-                        // Muss ein Tag frei bekommen. Check Samstags-Kontingent im aktuellen Monat.
+                        // Prüfe Samstags-Kontingent (2/Monat)
                         let satOfWk = daysOfWk.find(d => new Date(d).getDay() === 6);
                         let mStr = satOfWk ? satOfWk.substring(0,7) : monthVal;
                         let satsMonth = Object.keys(timeline[emp.name]).filter(d => d.startsWith(mStr) && new Date(d).getDay() === 6);
@@ -310,29 +333,29 @@
                         if(emp.satRule && satsFreeCount < 2 && satOfWk && timeline[emp.name][satOfWk] === "Work") {
                             timeline[emp.name][satOfWk] = "Frei";
                         } else {
-                            // Wochentag finden (Rotation + Besetzung)
-                            let bestD = null, maxBes = -1;
-                            daysOfWk.filter(d => new Date(d).getDay() <= 5 && timeline[emp.name][d] === "Work").forEach(d => {
-                                let schonFrei = employees.filter(e => ["Frei", "Wunschfrei"].includes(timeline[e.name][d])).length;
-                                if(schonFrei === 0) { // Priorität: Niemand sonst frei!
-                                    let bes = employees.filter(e => timeline[e.name][d] === "Work").length;
-                                    if(bes > maxBes) { maxBes = bes; bestD = d; }
-                                }
-                            });
-                            // Fallback falls alle Tage schon 1x frei haben: Nimm den Tag mit den meisten Leuten
-                            if(!bestD) {
+                            // Wochentag nach Rotation (Mo -> Fr)
+                            let rotationDay = ((wn + employees.indexOf(emp)) % 5) + 1;
+                            let targetDay = daysOfWk.find(d => new Date(d).getDay() === rotationDay && timeline[emp.name][d] === "Work");
+                            
+                            // Keine Doppelbelegung
+                            if(!targetDay || employees.some(e => e.name !== emp.name && ["Frei", "Wunschfrei"].includes(timeline[e.name][targetDay]))) {
+                                let bestD = null, maxBes = -1;
                                 daysOfWk.filter(d => new Date(d).getDay() <= 5 && timeline[emp.name][d] === "Work").forEach(d => {
-                                    let bes = employees.filter(e => timeline[e.name][d] === "Work").length;
-                                    if(bes > maxBes) { maxBes = bes; bestD = d; }
+                                    let schonFrei = employees.filter(e => ["Frei", "Wunschfrei"].includes(timeline[e.name][d])).length;
+                                    if(schonFrei === 0) {
+                                        let bes = employees.filter(e => timeline[e.name][d] === "Work").length;
+                                        if(bes > maxBes) { maxBes = bes; bestD = d; }
+                                    }
                                 });
+                                targetDay = bestD;
                             }
-                            if(bestD) timeline[emp.name][bestD] = "Frei";
+                            if(targetDay) timeline[emp.name][targetDay] = "Frei";
                         }
                     }
                 });
             });
 
-            // 3. SCHICHTEN (F/S)
+            // 3. Schichten (F/S)
             Object.keys(timeline[employees[0].name]).forEach(dStr => {
                 let working = employees.filter(e => timeline[e.name][dStr] === "Work");
                 if(working.length > 0) {
@@ -344,7 +367,7 @@
                             let idx = employees.indexOf(e);
                             timeline[e.name][dStr] = ((idx + wn) % 2 === 0) ? "F" : "S";
                         });
-                        // Mindestbesetzung & 3-Mann-Regel
+                        // Mindestbesetzung & 3-Mann-Notfall
                         let sTeam = working.filter(e => timeline[e.name][dStr] === "S");
                         let fTeam = working.filter(e => timeline[e.name][dStr] === "F");
                         if(working.length === 3) {
@@ -358,7 +381,7 @@
                 }
             });
 
-            // 4. ANZEIGE-DATEN
+            // 4. Anzeige
             let display = {}; let daysInM = new Date(year, month, 0).getDate();
             employees.forEach(e => {
                 display[e.name] = [];
@@ -372,7 +395,7 @@
             document.getElementById('plan-result-container').style.display = "block";
             renderTables(display, daysInM, 'plan-table-wrapper', 'hours-table-wrapper');
 
-        } catch (e) { errBox.innerText = "Fehler: " + e.message; errBox.style.display = "block"; }
+        } catch (err) { errBox.innerText = "Fehler: " + err.message; errBox.style.display = "block"; }
     }
 
     function renderTables(pData, dInM, pId, hId) {
@@ -387,7 +410,7 @@
                 else if(s === "Feiertag") { c = "cell-feiertag"; s = "FT"; }
                 else if(s === "Urlaub") { c = "cell-urlaub"; s = "U"; }
                 else if(s === "Krank") { c = "cell-krank"; s = "K"; }
-                else if(s.includes("Frei")) { c = "cell-frei"; s = "F"; }
+                else if(s === "Frei" || s.includes("Fest")) { c = "cell-frei"; s = "F"; }
                 else if(s.includes("So")) { c = "cell-we"; s = "-"; }
                 html += `<td class="${c}">${s}</td>`;
             });
@@ -395,11 +418,28 @@
         });
         document.getElementById(pId).innerHTML = html + "</tbody></table>";
 
-        let hHtml = `<table class="plan-table hours-table"><thead><tr><th>Name</th><th>Soll</th><th>Ist</th></tr></thead><tbody>`;
+        // Stundenberechnung
+        let hHtml = `<table class="plan-table hours-table"><thead><tr><th>Name</th><th>Soll</th><th>Ist</th><th>Diff</th></tr></thead><tbody>`;
         employees.forEach(emp => {
-            let ist = pData[emp.name].filter(d => ["F","S"].includes(d.status)).length * 8;
-            let ft = pData[emp.name].filter(d => d.status === "Feiertag").length * 8;
-            hHtml += `<tr><td>${emp.name}</td><td>160</td><td>${ist + ft}</td></tr>`;
+            let sollTotal = 0, istTotal = 0;
+            pData[emp.name].forEach(day => {
+                let dw = new Date(currentGeneratedPlan.monthVal + "-" + day.day).getDay();
+                let s = day.status;
+                let h = settings.h;
+                
+                if(s === "Feiertag") { istTotal += h.ft_frei_ist; sollTotal += h.ft_frei_soll; }
+                else if(dw === 0) { /* Sonntag = 0 */ }
+                else if(dw === 6) {
+                    if(s === "F") { istTotal += h.sa_work_ist; sollTotal += h.sa_work_soll; }
+                    else { istTotal += h.sa_frei_ist; sollTotal += h.sa_frei_soll; }
+                } else {
+                    if(s === "F" || s === "S") { istTotal += h.mofr_work_ist; sollTotal += h.mofr_work_soll; }
+                    else if(s === "Urlaub" || s === "Krank") { istTotal += 8; sollTotal += 8; }
+                    else { istTotal += h.mofr_frei_ist; sollTotal += h.mofr_frei_soll; }
+                }
+            });
+            let diff = istTotal - sollTotal;
+            hHtml += `<tr><td>${emp.name}</td><td>${sollTotal.toFixed(1)}</td><td>${istTotal.toFixed(1)}</td><td style="color:${diff<0?'red':'green'}">${diff.toFixed(1)}</td></tr>`;
         });
         document.getElementById(hId).innerHTML = hHtml + "</tbody></table>";
     }
@@ -421,11 +461,11 @@
     function viewPlan(m) {
         const d = savedPlans[m]; document.getElementById('saved-plan-view').style.display='block';
         renderTables(d.plan, d.daysInMonth, 'saved-plan-table-wrapper', 'saved-hours-table-wrapper');
-        window.scrollTo(0, document.getElementById('saved-plan-view').offsetTop);
     }
 
     function deletePlan(m) { if(confirm("Löschen?")) { delete savedPlans[m]; localStorage.setItem('saved_plans', JSON.stringify(savedPlans)); renderArchiv(); } }
 
+    // INITIALISIERUNG
     renderEmployees(); renderAbsences(); renderArchiv(); loadSettingsToForm();
   </script>
 </body>
