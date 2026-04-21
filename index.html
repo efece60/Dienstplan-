@@ -135,6 +135,42 @@
           <label>Mindestbesetzung Spätschicht</label>
           <input type="number" id="set-min-spaet" value="2">
         </div>
+      </div>
+
+      <div class="card">
+        <h3>Stundenberechnung (Soll / Ist)</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Hinweis: Urlaub und Krankheit (Mo-Fr: 8h, Sa/Feiertag: 0h) sind fest im Code hinterlegt.</p>
+
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Reguläre Tage (Mo-Fr)</h4>
+        <div class="form-group">
+            <label>Mo-Fr anwesend</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-work-ist" placeholder="Ist"></div>
+        </div>
+        <div class="form-group">
+            <label>Mo-Fr abwesend (Wunschfrei etc.)</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-mofr-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-mofr-frei-ist" placeholder="Ist"></div>
+        </div>
+
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Samstage</h4>
+        <div class="form-group">
+            <label>Samstag anwesend</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-work-ist" placeholder="Ist"></div>
+        </div>
+        <div class="form-group">
+            <label>Samstag abwesend (Wunschfrei etc.)</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-sa-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-sa-frei-ist" placeholder="Ist"></div>
+        </div>
+
+        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 3px;">Feiertage & Sondertage</h4>
+        <div class="form-group">
+            <label>Feiertage/Sondertage anwesend</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-work-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-work-ist" placeholder="Ist"></div>
+        </div>
+        <div class="form-group">
+            <label>Feiertage/Sondertage abwesend</label>
+            <div style="display:flex; gap:10px;"><input type="number" step="0.1" id="h-feiertag-frei-soll" placeholder="Soll"><input type="number" step="0.1" id="h-feiertag-frei-ist" placeholder="Ist"></div>
+        </div>
+
         <button class="primary-btn" onclick="saveSettings()" style="margin-top:1rem">Einstellungen speichern</button>
       </div>
     </section>
@@ -168,9 +204,31 @@
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
     let editIndex = -1;
     
-    let settings = JSON.parse(localStorage.getItem('app_settings')) || {
-        state: 'NW', fruehStart: '06:00', fruehEnd: '14:00', spaetStart: '14:00', spaetEnd: '22:00', saStart: '06:00', saEnd: '14:00', minSpaet: 2
+    // Einstellungen inkl. der gewünschten Felder laden (mit sinnvollen Standardwerten)
+    let settings = JSON.parse(localStorage.getItem('app_settings')) || {};
+    
+    // Standardwerte sicherstellen
+    if(!settings.state) settings.state = 'NW';
+    if(!settings.fruehStart) settings.fruehStart = '06:00';
+    if(!settings.fruehEnd) settings.fruehEnd = '14:00';
+    if(!settings.spaetStart) settings.spaetStart = '14:00';
+    if(!settings.spaetEnd) settings.spaetEnd = '22:00';
+    if(!settings.saStart) settings.saStart = '06:00';
+    if(!settings.saEnd) settings.saEnd = '14:00';
+    if(!settings.minSpaet) settings.minSpaet = 2;
+    
+    if(!settings.h) settings.h = {};
+    const defaultHours = {
+        mofr_work_soll: 8, mofr_work_ist: 8,
+        mofr_frei_soll: 8, mofr_frei_ist: 0,
+        sa_work_soll: 0, sa_work_ist: 8,
+        sa_frei_soll: 0, sa_frei_ist: 8,
+        feiertag_work_soll: 0, feiertag_work_ist: 4,
+        feiertag_frei_soll: 0, feiertag_frei_ist: 0
     };
+    for(let key in defaultHours) {
+        if(settings.h[key] === undefined) settings.h[key] = defaultHours[key];
+    }
 
     function loadSettingsToForm() {
         document.getElementById('set-state').value = settings.state;
@@ -181,6 +239,21 @@
         document.getElementById('set-sa-start').value = settings.saStart;
         document.getElementById('set-sa-end').value = settings.saEnd;
         document.getElementById('set-min-spaet').value = settings.minSpaet;
+
+        document.getElementById('h-mofr-work-soll').value = settings.h.mofr_work_soll;
+        document.getElementById('h-mofr-work-ist').value = settings.h.mofr_work_ist;
+        document.getElementById('h-mofr-frei-soll').value = settings.h.mofr_frei_soll;
+        document.getElementById('h-mofr-frei-ist').value = settings.h.mofr_frei_ist;
+
+        document.getElementById('h-sa-work-soll').value = settings.h.sa_work_soll;
+        document.getElementById('h-sa-work-ist').value = settings.h.sa_work_ist;
+        document.getElementById('h-sa-frei-soll').value = settings.h.sa_frei_soll;
+        document.getElementById('h-sa-frei-ist').value = settings.h.sa_frei_ist;
+
+        document.getElementById('h-feiertag-work-soll').value = settings.h.feiertag_work_soll;
+        document.getElementById('h-feiertag-work-ist').value = settings.h.feiertag_work_ist;
+        document.getElementById('h-feiertag-frei-soll').value = settings.h.feiertag_frei_soll;
+        document.getElementById('h-feiertag-frei-ist').value = settings.h.feiertag_frei_ist;
     }
 
     function saveSettings() {
@@ -192,7 +265,23 @@
             spaetEnd: document.getElementById('set-spaet-end').value,
             saStart: document.getElementById('set-sa-start').value,
             saEnd: document.getElementById('set-sa-end').value,
-            minSpaet: parseInt(document.getElementById('set-min-spaet').value) || 2
+            minSpaet: parseInt(document.getElementById('set-min-spaet').value) || 2,
+            h: {
+                mofr_work_soll: parseFloat(document.getElementById('h-mofr-work-soll').value) || 0,
+                mofr_work_ist: parseFloat(document.getElementById('h-mofr-work-ist').value) || 0,
+                mofr_frei_soll: parseFloat(document.getElementById('h-mofr-frei-soll').value) || 0,
+                mofr_frei_ist: parseFloat(document.getElementById('h-mofr-frei-ist').value) || 0,
+                
+                sa_work_soll: parseFloat(document.getElementById('h-sa-work-soll').value) || 0,
+                sa_work_ist: parseFloat(document.getElementById('h-sa-work-ist').value) || 0,
+                sa_frei_soll: parseFloat(document.getElementById('h-sa-frei-soll').value) || 0,
+                sa_frei_ist: parseFloat(document.getElementById('h-sa-frei-ist').value) || 0,
+                
+                feiertag_work_soll: parseFloat(document.getElementById('h-feiertag-work-soll').value) || 0,
+                feiertag_work_ist: parseFloat(document.getElementById('h-feiertag-work-ist').value) || 0,
+                feiertag_frei_soll: parseFloat(document.getElementById('h-feiertag-frei-soll').value) || 0,
+                feiertag_frei_ist: parseFloat(document.getElementById('h-feiertag-frei-ist').value) || 0
+            }
         };
         localStorage.setItem('app_settings', JSON.stringify(settings));
         alert("Einstellungen erfolgreich gespeichert!");
