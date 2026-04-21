@@ -1,0 +1,90 @@
+:root {
+  --primary: #007bff;
+  --bg-light: #f4f7f6;
+  --text-dark: #333;
+  --nav-bg: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  padding-bottom: 70px; /* Platz für die Bottom-Nav */
+}
+
+header {
+  background-color: var(--primary);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tab-content {
+  display: none;
+  padding: 1rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Bottom Navigation */
+nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: var(--nav-bg);
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #ccc;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+  z-index: 100;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 1rem 0.5rem;
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+}
+
+.nav-btn.active {
+  color: var(--primary);
+  font-weight: bold;
+  border-top: 3px solid var(--primary);
+}
+
+/* Form Styles */
+.card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+button.primary-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
