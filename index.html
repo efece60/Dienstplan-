@@ -14,7 +14,7 @@
   <main>
     <section id="team" class="tab-content active">
       <div class="card">
-        <h3>Mitarbeiter hinzufügen</h3>
+        <h3 id="form-title">Mitarbeiter hinzufügen</h3>
         <div class="form-group">
           <label>Name</label>
           <input type="text" id="emp-name" placeholder="z.B. Max Mustermann">
@@ -39,14 +39,18 @@
           <label>Schicht-Pairing (Immer gleiche Schicht mit...)</label>
           <select id="emp-pairing">
             <option value="none">Niemandem (Standard)</option>
-            </select>
+          </select>
         </div>
 
         <div class="checkbox-group">
           <input type="checkbox" id="emp-sat-rule">
           <label for="emp-sat-rule">Samstags-Regelung (2 im Monat frei)</label>
         </div>
-        <button class="primary-btn" onclick="addEmployee()" style="margin-top:1rem">Speichern</button>
+
+        <div id="form-buttons" style="margin-top: 1rem; display: flex; gap: 10px;">
+            <button class="primary-btn" id="btn-save" onclick="handleEmployeeSave()">Speichern</button>
+            <button class="primary-btn" id="btn-cancel" onclick="cancelEdit()" style="display:none; background: #666;">Abbrechen</button>
+        </div>
       </div>
 
       <div class="card">
@@ -101,6 +105,7 @@
   </nav>
 
   <script>
+    // --- NAVIGATION ---
     const navButtons = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     navButtons.forEach(btn => {
@@ -113,9 +118,12 @@
       });
     });
 
+    // --- DATEN & VARIABLEN ---
     let employees = JSON.parse(localStorage.getItem('team_data')) || [];
     let absences = JSON.parse(localStorage.getItem('absence_data')) || [];
+    let editIndex = -1; // -1 bedeutet wir legen neu an, alles andere ist der Index zum Bearbeiten
 
+    // --- TEAM LOGIK ---
     function renderEmployees() {
       const list = document.getElementById('employee-list');
       list.innerHTML = '';
@@ -123,7 +131,6 @@
         const div = document.createElement('div');
         div.className = 'employee-item';
         
-        // Zeige das Pairing in der Liste an, wenn es existiert
         let pairingText = emp.pairedWith && emp.pairedWith !== 'none' 
           ? `<br><span style="font-size: 0.8rem; color: #666;">🔗 Gekoppelt mit: ${emp.pairedWith}</span>` 
           : '';
@@ -136,38 +143,42 @@
                 ${pairingText}
             </div>
           </div>
-          <button class="delete-btn" onclick="deleteEmployee(${index})">Löschen</button>
+          <div style="display:flex; gap:10px;">
+            <button onclick="editEmployee(${index})" style="background:none; border:none; color:var(--primary); font-weight:bold;">Edit</button>
+            <button class="delete-btn" onclick="deleteEmployee(${index})">Löschen</button>
+          </div>
         `;
         list.appendChild(div);
       });
-      
       updateDropdowns(); 
     }
 
-    // Aktualisiert die Dropdowns für Urlaub UND Pairing
     function updateDropdowns() {
       const absSelect = document.getElementById('abs-employee');
       const pairSelect = document.getElementById('emp-pairing');
       
-      absSelect.innerHTML = '';
-      pairSelect.innerHTML = '<option value="none">Niemandem (Standard)</option>';
+      if(absSelect) absSelect.innerHTML = '';
+      if(pairSelect) {
+          pairSelect.innerHTML = '<option value="none">Niemandem (Standard)</option>';
+          employees.forEach((emp) => {
+            const pairOption = document.createElement('option');
+            pairOption.value = emp.name;
+            pairOption.text = emp.name;
+            pairSelect.appendChild(pairOption);
+          });
+      }
 
-      employees.forEach((emp) => {
-        // Für den Urlaub
-        const absOption = document.createElement('option');
-        absOption.value = emp.name;
-        absOption.text = emp.name;
-        absSelect.appendChild(absOption);
-
-        // Für das Pairing
-        const pairOption = document.createElement('option');
-        pairOption.value = emp.name;
-        pairOption.text = emp.name;
-        pairSelect.appendChild(pairOption);
-      });
+      if(absSelect) {
+          employees.forEach((emp) => {
+            const absOption = document.createElement('option');
+            absOption.value = emp.name;
+            absOption.text = emp.name;
+            absSelect.appendChild(absOption);
+          });
+      }
     }
 
-    function addEmployee() {
+    function handleEmployeeSave() {
       const name = document.getElementById('emp-name').value;
       const color = document.getElementById('emp-color').value;
       const freeday = document.getElementById('emp-freeday').value;
@@ -176,37 +187,82 @@
 
       if(!name) return alert("Bitte Namen eingeben");
 
-      employees.push({ name, color, freeday, pairedWith, satRule });
+      const empData = { name, color, freeday, pairedWith, satRule };
+
+      if(editIndex === -1) {
+          // Neu anlegen
+          employees.push(empData);
+      } else {
+          // Bestehenden bearbeiten
+          // Falls Name geändert wurde, Pairing-Referenzen in anderen Mitarbeitern anpassen
+          const oldName = employees[editIndex].name;
+          if(oldName !== name) {
+              employees.forEach(e => { if(e.pairedWith === oldName) e.pairedWith = name; });
+          }
+          employees[editIndex] = empData;
+          cancelEdit(); // Formular zurücksetzen
+      }
+
       localStorage.setItem('team_data', JSON.stringify(employees));
       renderEmployees();
-      document.getElementById('emp-name').value = '';
-      document.getElementById('emp-pairing').value = 'none'; // Zurücksetzen
+      clearForm();
+    }
+
+    function editEmployee(index) {
+        editIndex = index;
+        const emp = employees[index];
+        
+        // Formular füllen
+        document.getElementById('emp-name').value = emp.name;
+        document.getElementById('emp-color').value = emp.color;
+        document.getElementById('emp-freeday').value = emp.freeday;
+        document.getElementById('emp-pairing').value = emp.pairedWith || 'none';
+        document.getElementById('emp-sat-rule').checked = emp.satRule;
+
+        // UI anpassen
+        document.getElementById('form-title').innerText = "Mitarbeiter bearbeiten";
+        document.getElementById('btn-save').innerText = "Änderung übernehmen";
+        document.getElementById('btn-cancel').style.display = "block";
+        
+        // Nach oben scrollen damit man das Formular sieht
+        window.scrollTo(0,0);
+    }
+
+    function cancelEdit() {
+        editIndex = -1;
+        document.getElementById('form-title').innerText = "Mitarbeiter hinzufügen";
+        document.getElementById('btn-save').innerText = "Speichern";
+        document.getElementById('btn-cancel').style.display = "none";
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById('emp-name').value = '';
+        document.getElementById('emp-pairing').value = 'none';
+        document.getElementById('emp-sat-rule').checked = false;
+        document.getElementById('emp-freeday').value = 'none';
     }
 
     function deleteEmployee(index) {
       if(confirm("Mitarbeiter wirklich löschen?")) {
-        // Falls jemand mit diesem Mitarbeiter gekoppelt war, die Kopplung entfernen
         const deletedName = employees[index].name;
         employees.splice(index, 1);
-        
-        employees.forEach(emp => {
-            if(emp.pairedWith === deletedName) emp.pairedWith = 'none';
-        });
-
+        employees.forEach(emp => { if(emp.pairedWith === deletedName) emp.pairedWith = 'none'; });
         localStorage.setItem('team_data', JSON.stringify(employees));
         renderEmployees();
       }
     }
 
+    // --- URLAUB LOGIK ---
     function renderAbsences() {
       const list = document.getElementById('absence-list');
+      if(!list) return;
       list.innerHTML = '';
       absences.sort((a, b) => new Date(a.start) - new Date(b.start));
 
       absences.forEach((abs, index) => {
         const div = document.createElement('div');
         div.className = 'employee-item'; 
-        
         const startDate = new Date(abs.start).toLocaleDateString('de-DE');
         const endDate = new Date(abs.end).toLocaleDateString('de-DE');
         const dateString = abs.start === abs.end ? startDate : `${startDate} - ${endDate}`;
@@ -230,14 +286,10 @@
 
       if(!employeeName) return alert("Bitte erst Mitarbeiter anlegen!");
       if(!start) return alert("Bitte Startdatum auswählen!");
-      if(new Date(end) < new Date(start)) return alert("Das Enddatum darf nicht vor dem Startdatum liegen!");
-
+      
       absences.push({ employeeName, type, start, end });
       localStorage.setItem('absence_data', JSON.stringify(absences));
       renderAbsences();
-      
-      document.getElementById('abs-start').value = '';
-      document.getElementById('abs-end').value = '';
       alert('Erfolgreich eingetragen!');
     }
 
@@ -249,6 +301,7 @@
       }
     }
 
+    // Start
     renderEmployees();
     renderAbsences();
 
